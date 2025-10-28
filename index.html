@@ -1,13 +1,22 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>face-sandify</title>
+    <title>顔砂（かおすな）</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div class="l-wrapper">
+      <div class="l-background">
+        <div class="p-background"></div>
+      </div>
+      <div class="l-main">
+        <div class="p-error p-error--hidden">
+          <div class="p-error__message"></div>
+        </div>
+        <video class="p-webcam-video" autoplay playsinline></video>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
