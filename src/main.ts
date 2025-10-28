@@ -149,6 +149,8 @@ async function mainAsync(){
     if(isClearing && ALTERNATE_FIELD_ON_CLEAR){
       currentFieldIndex=(currentFieldIndex+1)%FIELD_COUNT;
       swapSandSimulators();
+      material.needsUpdate=true;
+
     }
     if(isCapturing){
       webcamTexture.capture();
@@ -174,7 +176,6 @@ async function mainAsync(){
     }
     renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
     material.colorNode=sandSimulatorBackground.getColorNode();
-    material.needsUpdate=true;
 
     // {
     //   const rawShader = await renderer.debug.getShaderAsync( scene, camera, cube );
