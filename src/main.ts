@@ -1,19 +1,11 @@
 import Stats from "stats-gl";
 import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERATION_PER_SEC, ITERATION_PER_STEP_MAX, CAPTURE_CYCLE_DURATION, CLEAR_CYCLE_DURATION, FIELD_COUNT, ALTERNATE_FIELD_ON_CLEAR } from './constants';
-import { getElementSize } from './dom_utils';
+import { getElementSize, querySelectorOrThrow } from './dom_utils';
 import { SandSimulator } from './SandSimulator';
 import './style.scss'
 
 import * as THREE from 'three/webgpu';
 // import { testStructAsync } from './test_struct';
-
-function querySelector<Type extends HTMLElement>(query:string):Type{
-  const element = document.querySelector<Type>(query);
-  if(!element){
-    throw new Error(`element is null : ${query}`);
-  }
-  return element;
-}
 
 function getErrorMessage(error:unknown){
   if(error instanceof Error){
@@ -30,16 +22,16 @@ function getErrorMessage(error:unknown){
 }
 
 function showError(message:string){
-  const errorElement=querySelector<HTMLElement>(".p-error");
+  const errorElement=querySelectorOrThrow<HTMLElement>(".p-error");
   errorElement.classList.remove("p-error--hidden");
-  const errorMessageElement=querySelector<HTMLElement>(".p-error__message");
+  const errorMessageElement=querySelectorOrThrow<HTMLElement>(".p-error__message");
   errorMessageElement.textContent=message;
 
 }
 
 
 async function mainAsync(){
-  const backgroundElement=querySelector<HTMLElement>(".p-background");
+  const backgroundElement=querySelectorOrThrow<HTMLElement>(".p-background");
 
   const {width,height}=getElementSize(backgroundElement);
   const scene = new THREE.Scene();
@@ -93,7 +85,7 @@ async function mainAsync(){
   const geometry = new THREE.BoxGeometry( 1, 1, 1 );
   const material = new THREE.MeshStandardNodeMaterial();
 
-  const webcamVideoElement = querySelector<HTMLVideoElement>(".p-webcam-video");
+  const webcamVideoElement = querySelectorOrThrow<HTMLVideoElement>(".p-webcam-video");
   let webcamCanvasTexture:THREE.CanvasTexture;
   if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
     const constraints={
