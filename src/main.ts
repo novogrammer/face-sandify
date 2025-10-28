@@ -84,12 +84,24 @@ async function mainAsync(){
     return;
   }
 
-  const sandSimulator = new SandSimulator(
+  let sandSimulatorBackground = new SandSimulator(
     SAND_SIMULATOR_WIDTH,
     SAND_SIMULATOR_HEIGHT,
     webcamTexture.texture,
     webcamTexture.size.clone(),
   );
+  let sandSimulatorForeground = new SandSimulator(
+    SAND_SIMULATOR_WIDTH,
+    SAND_SIMULATOR_HEIGHT,
+    webcamTexture.texture,
+    webcamTexture.size.clone(),
+  );
+  function swapSandSimulators(){
+    const temp = sandSimulatorForeground;
+    sandSimulatorForeground = sandSimulatorBackground;
+    sandSimulatorBackground = temp;
+  }
+
   const cube = new THREE.Mesh( geometry, material );
   scene.add( cube );
 
@@ -136,6 +148,7 @@ async function mainAsync(){
     const isClearing = Math.floor(previousTime/clearDuration) < Math.floor(time/clearDuration);
     if(isClearing && ALTERNATE_FIELD_ON_CLEAR){
       currentFieldIndex=(currentFieldIndex+1)%FIELD_COUNT;
+      swapSandSimulators();
     }
     if(isCapturing){
       webcamTexture.capture();
@@ -152,15 +165,16 @@ async function mainAsync(){
     );
     for(let i=0;i<iterationPerFrame;i++){
       if(i==0){
-        sandSimulator.uDeltaTime.value=deltaTime;
-        await sandSimulator.updateFrameAsync(renderer,isCapturing,isClearing,currentFieldIndex);
+        sandSimulatorBackground.uDeltaTime.value=deltaTime;
+        await sandSimulatorBackground.updateFrameAsync(renderer,isCapturing,isClearing,currentFieldIndex);
       }else{
-        sandSimulator.uDeltaTime.value=0;
-        await sandSimulator.updateFrameAsync(renderer,false,false,currentFieldIndex);
+        sandSimulatorBackground.uDeltaTime.value=0;
+        await sandSimulatorBackground.updateFrameAsync(renderer,false,false,currentFieldIndex);
       }
     }
     renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
-    material.colorNode=sandSimulator.getColorNode();
+    material.colorNode=sandSimulatorBackground.getColorNode();
+    material.needsUpdate=true;
 
     // {
     //   const rawShader = await renderer.debug.getShaderAsync( scene, camera, cube );
