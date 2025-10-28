@@ -1,9 +1,57 @@
-
 body {
-  margin: 0;
+  margin:0;
 }
-
 * {
   box-sizing: border-box;
 }
 
+
+.l-wrapper{
+  position:relative;
+}
+
+.l-background{
+  position:fixed;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  pointer-events: none;
+  background:#f0f;
+}
+.l-main{
+  position:relative;
+  overflow:hidden;
+}
+
+.p-background{
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  &__canvas{
+
+  }
+}
+
+.p-error{
+  background:#fff;
+  border:#000 solid 1px;
+  border-radius: 2vw;
+  padding:2vw;
+  &--hidden{
+    display:none;
+  }
+  &__message{
+    color:#f00;
+    font-weight: bold;
+    text-align: center;
+    white-space: pre-wrap;
+  }
+}
+
+.p-webcam-video{
+  display:none;
+}
