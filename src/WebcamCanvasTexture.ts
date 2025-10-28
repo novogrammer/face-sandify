@@ -15,11 +15,14 @@ export class WebcamCanvasTexture {
   private constructor(
     videoElement: HTMLVideoElement,
     canvasElement: HTMLCanvasElement,
-    canvasContext: CanvasRenderingContext2D,
     canvasTexture: THREE.CanvasTexture,
   ) {
     this.videoElement = videoElement;
     this.canvasElement = canvasElement;
+    const canvasContext = canvasElement.getContext('2d');
+    if (!canvasContext) {
+      throw new Error('Failed to acquire 2D context from webcam canvas.');
+    }
     this.canvasContext = canvasContext;
     this.canvasTexture = canvasTexture;
     this.size = new THREE.Vector2(canvasElement.width, canvasElement.height);
@@ -59,10 +62,6 @@ export class WebcamCanvasTexture {
     canvasElement.width = videoElement.videoWidth;
     canvasElement.height = videoElement.videoHeight;
 
-    const canvasContext = canvasElement.getContext('2d');
-    if (!canvasContext) {
-      throw new Error('Failed to acquire 2D context from webcam canvas.');
-    }
 
     // NOTE: Wait a tick to ensure the first frame is ready before drawing.
     await delay(500);
@@ -71,7 +70,6 @@ export class WebcamCanvasTexture {
     const instance = new WebcamCanvasTexture(
       videoElement,
       canvasElement,
-      canvasContext,
       canvasTexture,
     );
     instance.capture();
