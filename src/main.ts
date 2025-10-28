@@ -2,6 +2,7 @@ import Stats from "stats-gl";
 import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERATION_PER_SEC, ITERATION_PER_STEP_MAX, CAPTURE_CYCLE_DURATION, CLEAR_CYCLE_DURATION, FIELD_COUNT, ALTERNATE_FIELD_ON_CLEAR } from './constants';
 import { getElementSize, querySelectorOrThrow } from './dom_utils';
 import { SandSimulator } from './SandSimulator';
+import { WebcamCanvasTexture } from './WebcamCanvasTexture';
 import './style.scss'
 
 import * as THREE from 'three/webgpu';
@@ -86,48 +87,22 @@ async function mainAsync(){
   const material = new THREE.MeshStandardNodeMaterial();
 
   const webcamVideoElement = querySelectorOrThrow<HTMLVideoElement>(".p-webcam-video");
-  let webcamCanvasTexture:THREE.CanvasTexture;
-  if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
-    const constraints={
-      video:{
-        width: 1280,
-        height: 720,
-        facingMode: 'user',
-      },
-    };
-    navigator.mediaDevices.getUserMedia(constraints).then(function(stream){
-      webcamVideoElement.srcObject = stream;
-    }).catch(function(error){
-      console.error('Unable to access the camera/webcam.', error);
-    });
-  } else {
-    console.error('MediaDevices interface not available.');
+  let webcamTexture:WebcamCanvasTexture;
+  try{
+    webcamTexture=await WebcamCanvasTexture.create(webcamVideoElement);
+  }catch(error){
+    const message=`Webcamの初期化に失敗しました。\n${getErrorMessage(error)}`;
+    showError(message);
+    console.error(error);
+    return;
   }
-  const canvasElement = document.createElement("canvas");
-  await new Promise<void>((resolve)=>{
-    webcamVideoElement.addEventListener('loadedmetadata', () => {
-      webcamVideoElement.play();
-      resolve();
-    },{once:true});
-    
-  });
-  canvasElement.width  = webcamVideoElement.videoWidth;
-  canvasElement.height = webcamVideoElement.videoHeight;
 
-  const ctx=canvasElement.getContext("2d");
-  if(!ctx){
-    throw new Error("ctx is null");
-  }
-  // TODO: このタイミングの描画がうまく反映できていない。
-  await new Promise<void>((resolve)=>{
-    setTimeout(resolve,500);
-  });
-  ctx.drawImage(webcamVideoElement!,0,0);
-
-  webcamCanvasTexture=new THREE.CanvasTexture(canvasElement);
-  
-
-  const sandSimulator = new SandSimulator(SAND_SIMULATOR_WIDTH,SAND_SIMULATOR_HEIGHT,webcamCanvasTexture,new THREE.Vector2(canvasElement.width,canvasElement.height));
+  const sandSimulator = new SandSimulator(
+    SAND_SIMULATOR_WIDTH,
+    SAND_SIMULATOR_HEIGHT,
+    webcamTexture.texture,
+    webcamTexture.size.clone(),
+  );
   const cube = new THREE.Mesh( geometry, material );
   scene.add( cube );
 
@@ -176,14 +151,7 @@ async function mainAsync(){
       currentFieldIndex=(currentFieldIndex+1)%FIELD_COUNT;
     }
     if(isCapturing){
-      if(ctx){
-        ctx.save();
-        ctx.translate(canvasElement.width, 0);
-        ctx.scale(-1, 1);
-        ctx.drawImage(webcamVideoElement!, 0, 0);
-        ctx.restore();
-        webcamCanvasTexture.needsUpdate=true;
-      }
+      webcamTexture.capture();
     }
 
     // cube.rotation.x += 0.01;
@@ -227,6 +195,4 @@ async function mainAsync(){
 mainAsync().catch((error)=>{
   console.error(error);
 });
-
-
 
