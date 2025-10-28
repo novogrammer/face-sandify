@@ -172,11 +172,11 @@ export class SandSimulator{
   computeNodePing:ShaderNodeObject<THREE.ComputeNode>;
   computeNodePong:ShaderNodeObject<THREE.ComputeNode>;
 
-  colorNodePing:ShaderNodeObject<THREE.TSL.ShaderCallNodeInternal>;
-  colorNodePong:ShaderNodeObject<THREE.TSL.ShaderCallNodeInternal>;
+  colorNode:ShaderNodeObject<THREE.TSL.ShaderCallNodeInternal>;
 
 
   isPing:boolean=true;
+  uIsPing:ShaderNodeObject<THREE.UniformNode<number>>=uniform(1);
 
   constructor(width:number,height:number,webcamTexture:THREE.Texture,webcamTextureSize:THREE.Vector2){
     this.width=width;
@@ -440,20 +440,15 @@ export class SandSimulator{
       const cell=sampleCell(uv(),kindStorage,luminanceStorage,ttlStorage).toVar("cell");
       return toColor(cell);
     });
-    this.colorNodePing=colorFn(this.storageKindPong,this.storageLuminancePong,this.storageTtlPong);
-    this.colorNodePong=colorFn(this.storageKindPing,this.storageLuminancePing,this.storageTtlPing);
+    const colorNodePing=colorFn(this.storageKindPong,this.storageLuminancePong,this.storageTtlPong);
+    const colorNodePong=colorFn(this.storageKindPing,this.storageLuminancePing,this.storageTtlPing);
+    this.colorNode=select(this.uIsPing.notEqual(0),colorNodePing,colorNodePong);
   }
   toggleTexture(){
     this.isPing=!this.isPing;
+    this.uIsPing.value=this.isPing?1:0;
   }
 
-  getColorNode(){
-    if(this.isPing){
-      return this.colorNodePing;
-    }else{
-      return this.colorNodePong;
-    }
-  }
 
   async updateFrameAsync(renderer:THREE.WebGPURenderer,isCapturing:boolean,isClearing:boolean,fieldIndex:number) {  
     this.toggleTexture();

@@ -103,6 +103,7 @@ async function mainAsync(){
   }
 
   const cube = new THREE.Mesh( geometry, material );
+  material.colorNode=sandSimulatorBackground.colorNode;
   scene.add( cube );
 
   camera.position.z = 2.5;
@@ -149,8 +150,9 @@ async function mainAsync(){
     if(isClearing && ALTERNATE_FIELD_ON_CLEAR){
       currentFieldIndex=(currentFieldIndex+1)%FIELD_COUNT;
       swapSandSimulators();
+      material.colorNode=sandSimulatorBackground.colorNode;
+      // TODO: TSLのビルドが走るので、あらかじめオブジェクトを二つ用意した方がいいかもしれない。
       material.needsUpdate=true;
-
     }
     if(isCapturing){
       webcamTexture.capture();
@@ -175,7 +177,6 @@ async function mainAsync(){
       }
     }
     renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
-    material.colorNode=sandSimulatorBackground.getColorNode();
 
     // {
     //   const rawShader = await renderer.debug.getShaderAsync( scene, camera, cube );
