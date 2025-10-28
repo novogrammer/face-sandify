@@ -17,13 +17,12 @@ export class WebcamCanvasTexture {
     canvasElement: HTMLCanvasElement,
     canvasContext: CanvasRenderingContext2D,
     canvasTexture: THREE.CanvasTexture,
-    size: THREE.Vector2,
   ) {
     this.videoElement = videoElement;
     this.canvasElement = canvasElement;
     this.canvasContext = canvasContext;
     this.canvasTexture = canvasTexture;
-    this.size = size;
+    this.size = new THREE.Vector2(canvasElement.width, canvasElement.height);
   }
 
   static async create(videoElement: HTMLVideoElement): Promise<WebcamCanvasTexture> {
@@ -69,13 +68,11 @@ export class WebcamCanvasTexture {
     await delay(500);
 
     const canvasTexture = new THREE.CanvasTexture(canvasElement);
-    const size = new THREE.Vector2(canvasElement.width, canvasElement.height);
     const instance = new WebcamCanvasTexture(
       videoElement,
       canvasElement,
       canvasContext,
       canvasTexture,
-      size,
     );
     instance.capture();
     return instance;
@@ -94,4 +91,3 @@ export class WebcamCanvasTexture {
     this.canvasTexture.needsUpdate = true;
   }
 }
-
