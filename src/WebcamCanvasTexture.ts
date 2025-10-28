@@ -1,4 +1,5 @@
 import * as THREE from 'three/webgpu';
+import { getErrorMessage } from './log_utils';
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -94,16 +95,3 @@ export class WebcamCanvasTexture {
   }
 }
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  if (typeof error === 'string') {
-    return error;
-  }
-  try {
-    return JSON.stringify(error);
-  } catch {
-    return String(error);
-  }
-}
