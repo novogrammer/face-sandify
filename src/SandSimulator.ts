@@ -153,30 +153,37 @@ const makeNewField=Fn(([uv,width,fieldIndex]:[ReturnType<typeof vec2>,ReturnType
 
 
 export class SandSimulator{
-  width:number;
-  height:number;
-  webcamTexture:THREE.Texture;
-  storageKindPing:FloatStorageNode;
-  storageKindPong:FloatStorageNode;
-  storageLuminancePing:FloatStorageNode;
-  storageLuminancePong:FloatStorageNode;
-  storageTtlPing:FloatStorageNode;
-  storageTtlPong:FloatStorageNode;
+  private readonly width:number;
+  private readonly height:number;
+  private readonly webcamTexture:THREE.Texture;
+  private readonly storageKindPing:FloatStorageNode;
+  private readonly storageKindPong:FloatStorageNode;
+  private readonly storageLuminancePing:FloatStorageNode;
+  private readonly storageLuminancePong:FloatStorageNode;
+  private readonly storageTtlPing:FloatStorageNode;
+  private readonly storageTtlPong:FloatStorageNode;
 
-  uIsCapturing:ShaderNodeObject<THREE.UniformNode<number>>;
-  uWebcamTextureSize:ShaderNodeObject<THREE.UniformNode<THREE.Vector2>>;
-  uDeltaTime:ShaderNodeObject<THREE.UniformNode<number>>;
-  uIsClearing:ShaderNodeObject<THREE.UniformNode<number>>;
-  uFieldIndex:ShaderNodeObject<THREE.UniformNode<number>>;
+  private readonly uIsCapturing:ShaderNodeObject<THREE.UniformNode<number>>;
+  private readonly uWebcamTextureSize:ShaderNodeObject<THREE.UniformNode<THREE.Vector2>>;
+  readonly _uDeltaTime:ShaderNodeObject<THREE.UniformNode<number>>;
+  get uDeltaTime(){
+    return this._uDeltaTime;
+  }
 
-  computeNodePing:ShaderNodeObject<THREE.ComputeNode>;
-  computeNodePong:ShaderNodeObject<THREE.ComputeNode>;
+  private readonly uIsClearing:ShaderNodeObject<THREE.UniformNode<number>>;
+  private readonly uFieldIndex:ShaderNodeObject<THREE.UniformNode<number>>;
 
-  colorNode:ShaderNodeObject<THREE.TSL.ShaderCallNodeInternal>;
+  private readonly computeNodePing:ShaderNodeObject<THREE.ComputeNode>;
+  private readonly computeNodePong:ShaderNodeObject<THREE.ComputeNode>;
+
+  private readonly _colorNode:ShaderNodeObject<THREE.TSL.ShaderCallNodeInternal>;
+  get colorNode(){
+    return this._colorNode;
+  }
 
 
-  isPing:boolean=true;
-  uIsPing:ShaderNodeObject<THREE.UniformNode<number>>=uniform(1);
+  private isPing:boolean=true;
+  private readonly uIsPing:ShaderNodeObject<THREE.UniformNode<number>>=uniform(1);
 
   constructor(width:number,height:number,webcamTexture:THREE.Texture,webcamTextureSize:THREE.Vector2){
     this.width=width;
@@ -195,7 +202,7 @@ export class SandSimulator{
 
     this.uIsCapturing=uniform(0);
     this.uWebcamTextureSize=uniform(webcamTextureSize);
-    this.uDeltaTime=uniform(0);
+    this._uDeltaTime=uniform(0);
     this.uIsClearing=uniform(0);
     this.uFieldIndex=uniform(0);
 
@@ -442,7 +449,7 @@ export class SandSimulator{
     });
     const colorNodePing=colorFn(this.storageKindPong,this.storageLuminancePong,this.storageTtlPong);
     const colorNodePong=colorFn(this.storageKindPing,this.storageLuminancePing,this.storageTtlPing);
-    this.colorNode=select(this.uIsPing.notEqual(0),colorNodePing,colorNodePong);
+    this._colorNode=select(this.uIsPing.notEqual(0),colorNodePing,colorNodePong);
   }
   toggleTexture(){
     this.isPing=!this.isPing;
