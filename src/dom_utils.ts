@@ -17,3 +17,11 @@ export function getElementSize(element: HTMLElement): Size {
     height: element.clientHeight,
   }
 }
+
+export function querySelectorOrThrow<Type extends HTMLElement>(query:string):Type{
+  const element = document.querySelector<Type>(query);
+  if(!element){
+    throw new Error(`element is null : ${query}`);
+  }
+  return element;
+}
