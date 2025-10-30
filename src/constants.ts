@@ -14,8 +14,14 @@ export const IGNORE_SAND_TTL=true;
 export const SAND_SPACING=2;
 
 // 砂を一定間隔で全消去する周期（秒）
-export const CLEAR_CYCLE_DURATION=30;
+export const CLEAR_CYCLE_DURATION=15;
 // フィールド（壁・シンク）プリセットの数
 export const FIELD_COUNT=2;
 // クリア毎にフィールドを切り替えるかどうか
 export const ALTERNATE_FIELD_ON_CLEAR=true;
+
+
+// 一辺の個数
+export const FOREGROUND_GRID_RESOLUTION=10;
+// 一辺の長さ
+export const FOREGROUND_GRID_SIZE=1;

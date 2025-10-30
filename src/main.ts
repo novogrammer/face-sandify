@@ -1,5 +1,5 @@
 import Stats from "stats-gl";
-import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERATION_PER_SEC, ITERATION_PER_STEP_MAX, CAPTURE_CYCLE_DURATION, CLEAR_CYCLE_DURATION, FIELD_COUNT, ALTERNATE_FIELD_ON_CLEAR } from './constants';
+import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERATION_PER_SEC, ITERATION_PER_STEP_MAX, CAPTURE_CYCLE_DURATION, CLEAR_CYCLE_DURATION, FIELD_COUNT, ALTERNATE_FIELD_ON_CLEAR, FOREGROUND_GRID_SIZE, FOREGROUND_GRID_RESOLUTION } from './constants';
 import { getElementSize, querySelectorOrThrow } from './dom_utils';
 import { SandSimulator } from './SandSimulator';
 import { WebcamCanvasTexture } from './WebcamCanvasTexture';
@@ -7,6 +7,7 @@ import './style.scss'
 
 import * as THREE from 'three/webgpu';
 import { getErrorMessage } from "./log_utils";
+import { GridUpdater } from "./GridUpdater";
 // import { testStructAsync } from './test_struct';
 
 function showError(message:string){
@@ -100,20 +101,25 @@ async function mainAsync(){
     sandSimulatorBackground = temp;
   }
 
-  let cube:THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
+  let foregroundUpdater:GridUpdater;
+  let foreground:THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
   {
-    const geometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
+    const cellSize = FOREGROUND_GRID_SIZE / FOREGROUND_GRID_RESOLUTION;
+    const geometry = new THREE.BoxGeometry( cellSize, cellSize, cellSize );
     const material = new THREE.MeshStandardNodeMaterial();
-    cube = new THREE.Mesh( geometry, material );
-    cube.position.x=0.5;
+    foreground = new THREE.Mesh( geometry, material );
+    foreground.position.z = cellSize * -0.5;
+    foregroundUpdater=new GridUpdater(foreground,FOREGROUND_GRID_SIZE,FOREGROUND_GRID_RESOLUTION);
   }
-  cube.material.colorNode=sandSimulatorForeground.colorNode;
-  scene.add( cube );
+  foreground.material.colorNode=sandSimulatorForeground.colorNode;
+  scene.add( foreground );
 
   let background:THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
   {
     const geometry = new THREE.PlaneGeometry( 1, 1);
-    const material = new THREE.MeshStandardNodeMaterial();
+    const material = new THREE.MeshStandardNodeMaterial({
+      depthWrite:false,
+    });
     background = new THREE.Mesh( geometry, material );
   }
   background.material.colorNode=sandSimulatorBackground.colorNode;
@@ -144,6 +150,7 @@ async function mainAsync(){
 
   let isComputing=false;
   let previousTime=-0.001;
+  let gridStartTime=0;
   let currentFieldIndex=0;
 
   renderer.setAnimationLoop( animate );
@@ -164,11 +171,12 @@ async function mainAsync(){
     if(isClearing && ALTERNATE_FIELD_ON_CLEAR){
       currentFieldIndex=(currentFieldIndex+1)%FIELD_COUNT;
       swapSandSimulators();
-      cube.material.colorNode=sandSimulatorForeground.colorNode;
+      foreground.material.colorNode=sandSimulatorForeground.colorNode;
       background.material.colorNode=sandSimulatorBackground.colorNode;
       // TODO: TSLのビルドが走るので、あらかじめオブジェクトを二つ用意した方がいいかもしれない。
-      cube.material.needsUpdate=true;
+      foreground.material.needsUpdate=true;
       background.material.needsUpdate=true;
+      gridStartTime = time;
     }
     if(isCapturing){
       webcamTexture.capture();
@@ -199,6 +207,8 @@ async function mainAsync(){
     //   console.log(rawShader);
     //   debugger;
     // }
+
+    foregroundUpdater.time = time - gridStartTime;
 
     await renderer.renderAsync( scene, camera );
     renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
