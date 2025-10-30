@@ -70,8 +70,6 @@ async function mainAsync(){
 
 
 
-  const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-  const material = new THREE.MeshStandardNodeMaterial();
 
   const webcamVideoElement = querySelectorOrThrow<HTMLVideoElement>(".p-webcam-video");
   let webcamTexture:WebcamCanvasTexture;
@@ -102,9 +100,25 @@ async function mainAsync(){
     sandSimulatorBackground = temp;
   }
 
-  const cube = new THREE.Mesh( geometry, material );
-  material.colorNode=sandSimulatorBackground.colorNode;
+  let cube:THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
+  {
+    const geometry = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
+    const material = new THREE.MeshStandardNodeMaterial();
+    cube = new THREE.Mesh( geometry, material );
+    cube.position.x=0.5;
+  }
+  cube.material.colorNode=sandSimulatorForeground.colorNode;
   scene.add( cube );
+
+  let background:THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
+  {
+    const geometry = new THREE.PlaneGeometry( 1, 1);
+    const material = new THREE.MeshStandardNodeMaterial();
+    background = new THREE.Mesh( geometry, material );
+  }
+  background.material.colorNode=sandSimulatorBackground.colorNode;
+  scene.add( background );
+
 
   camera.position.z = 2.5;
 
@@ -150,9 +164,11 @@ async function mainAsync(){
     if(isClearing && ALTERNATE_FIELD_ON_CLEAR){
       currentFieldIndex=(currentFieldIndex+1)%FIELD_COUNT;
       swapSandSimulators();
-      material.colorNode=sandSimulatorBackground.colorNode;
+      cube.material.colorNode=sandSimulatorForeground.colorNode;
+      background.material.colorNode=sandSimulatorBackground.colorNode;
       // TODO: TSLのビルドが走るので、あらかじめオブジェクトを二つ用意した方がいいかもしれない。
-      material.needsUpdate=true;
+      cube.material.needsUpdate=true;
+      background.material.needsUpdate=true;
     }
     if(isCapturing){
       webcamTexture.capture();
