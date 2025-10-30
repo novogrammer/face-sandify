@@ -41,7 +41,7 @@ export class GridUpdater{
     this.gridResolution=gridResolution;
     this.grid.count = this.gridResolution * this.gridResolution;
 
-    const orientation = axisAngleToMat3(vec3(0,1,0),float(this.uTime)).toVar();
+    const orientation = axisAngleToMat3(vec3(0,1,0),float(this.uTime).mul(180*THREE.MathUtils.DEG2RAD)).toVar();
     this.grid.material.positionNode = Fn(()=>{
       const ix = float(instanceIndex.mod(this.gridResolution)).toVar();
       const iy = float(instanceIndex.div(this.gridResolution)).toVar();
@@ -49,7 +49,9 @@ export class GridUpdater{
 
 
       const gridOffset = float(this.gridSize).mul(-0.5).add(cellSize.mul(0.5));
-      const offsetPosition = vec3(ix.mul(cellSize).add(gridOffset),iy.mul(cellSize).add(gridOffset),0);
+      const offsetPositionBase = vec3(ix.mul(cellSize).add(gridOffset),iy.mul(cellSize).add(gridOffset),0).toVar();
+      const offsetPosition = offsetPositionBase//.mul(this.uTime.mul(1).add(1));
+      
       const movePosition = vec3(0,this.uTime.mul(-0.1),0);
       return orientation.mul(positionLocal).add(offsetPosition.add(movePosition));
     })();
