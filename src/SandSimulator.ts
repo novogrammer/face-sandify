@@ -191,7 +191,7 @@ export class SandSimulator{
     this.webcamTexture=webcamTexture;
 
     const cellCount=width*height;
-    const createFloatStorage=(label:string)=>instancedArray(new Float32Array(cellCount),"float").label(label) as FloatStorageNode;
+    const createFloatStorage=(label:string)=>instancedArray(new Float32Array(cellCount),"float").setName(label) as FloatStorageNode;
     this.storageKindPing=createFloatStorage("kindPing");
     this.storageKindPong=createFloatStorage("kindPong");
     this.storageLuminancePing=createFloatStorage("luminancePing");
@@ -420,11 +420,11 @@ export class SandSimulator{
       FloatStorageNode,
       FloatStorageNode,
     ]) => {
-      const uvClamped=clamp(uvCoord,vec2(0.0),vec2(0.999999)).toVar("uvClamped");
-      const scaled=floor(uvClamped.mul(vec2(float(width),float(height)))).toVar("scaled");
-      const ix=int(clamp(scaled.x,0.0,float(width-1))).toVar("ix");
-      const iy=int(clamp(scaled.y,0.0,float(height-1))).toVar("iy");
-      const index=iy.mul(int(width)).add(ix).toVar("index");
+      const uvClamped=clamp(uvCoord,vec2(0.0),vec2(0.999999)).toVar();
+      const scaled=floor(uvClamped.mul(vec2(float(width),float(height)))).toVar();
+      const ix=int(clamp(scaled.x,0.0,float(width-1))).toVar();
+      const iy=int(clamp(scaled.y,0.0,float(height-1))).toVar();
+      const index=iy.mul(int(width)).add(ix).toVar();
       return Cell({
         // @ts-ignore
         kind:int(kindStorage.element(index)),
@@ -444,7 +444,7 @@ export class SandSimulator{
       FloatStorageNode,
       FloatStorageNode,
     ])=>{
-      const cell=sampleCell(uv(),kindStorage,luminanceStorage,ttlStorage).toVar("cell");
+      const cell=sampleCell(uv(),kindStorage,luminanceStorage,ttlStorage).toVar();
       return toColor(cell);
     });
     const colorNodePing=colorFn(this.storageKindPong,this.storageLuminancePong,this.storageTtlPong);
