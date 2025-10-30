@@ -116,7 +116,7 @@ async function mainAsync(){
 
   let background:THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
   {
-    const geometry = new THREE.PlaneGeometry( 1, 1);
+    const geometry = new THREE.PlaneGeometry( FOREGROUND_GRID_SIZE, FOREGROUND_GRID_SIZE);
     const material = new THREE.MeshStandardNodeMaterial({
       depthWrite:false,
     });
