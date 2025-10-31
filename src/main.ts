@@ -84,26 +84,35 @@ async function mainAsync(){
   }
 
   let foregroundUpdater:GridUpdater;
-  let foreground:THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
+  let foregroundPrimary:THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
   {
     const cellSize = FOREGROUND_GRID_SIZE / FOREGROUND_GRID_RESOLUTION;
     const geometry = new THREE.BoxGeometry( cellSize, cellSize, cellSize );
     const material = new THREE.MeshStandardNodeMaterial();
-    foreground = new THREE.Mesh( geometry, material );
-    foreground.position.z = cellSize * -0.5;
-    foregroundUpdater=new GridUpdater(foreground,FOREGROUND_GRID_SIZE,FOREGROUND_GRID_RESOLUTION);
+    foregroundPrimary = new THREE.Mesh( geometry, material );
+    foregroundPrimary.position.z = cellSize * -0.5;
+    foregroundUpdater=new GridUpdater(foregroundPrimary,FOREGROUND_GRID_SIZE,FOREGROUND_GRID_RESOLUTION);
   }
-  scene.add( foreground );
+  scene.add( foregroundPrimary );
+  let foregroundSecondary = foregroundPrimary.clone();
+  foregroundSecondary.visible=false;
+  foregroundSecondary.count=foregroundPrimary.count;
+  foregroundSecondary.material=foregroundPrimary.material.clone();
+  scene.add(foregroundSecondary);
 
-  let background:THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
+  let backgroundPrimary:THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
   {
     const geometry = new THREE.PlaneGeometry( FOREGROUND_GRID_SIZE, FOREGROUND_GRID_SIZE);
     const material = new THREE.MeshStandardNodeMaterial({
       depthWrite:false,
     });
-    background = new THREE.Mesh( geometry, material );
+    backgroundPrimary = new THREE.Mesh( geometry, material );
   }
-  scene.add( background );
+  scene.add( backgroundPrimary );
+  let backgroundSecondary = backgroundPrimary.clone();
+  backgroundSecondary.visible=false;
+  backgroundSecondary.material=backgroundPrimary.material.clone();
+  scene.add( backgroundSecondary );
 
 
   const gridUvNode = foregroundUpdater.createGridUvNode();
@@ -122,14 +131,25 @@ async function mainAsync(){
     gridUvNode,
   );
   function swapSandSimulators(){
-    const temp = sandSimulatorForeground;
-    sandSimulatorForeground = sandSimulatorBackground;
-    sandSimulatorBackground = temp;
+    [sandSimulatorForeground,sandSimulatorBackground]=[sandSimulatorBackground,sandSimulatorForeground];
+    [foregroundPrimary,foregroundSecondary]=[foregroundSecondary,foregroundPrimary];
+    [backgroundPrimary,backgroundSecondary]=[backgroundSecondary,backgroundPrimary];
+
+    foregroundPrimary.visible=true;
+    foregroundSecondary.visible=false;
+    backgroundPrimary.visible=true;
+    backgroundSecondary.visible=false;
   }
 
-  foreground.material.colorNode=sandSimulatorForeground.colorNodeForGrid;
+  foregroundPrimary.material.colorNode=sandSimulatorForeground.colorNodeForGrid;
+  foregroundSecondary.material.colorNode=sandSimulatorBackground.colorNodeForGrid;
+  foregroundPrimary.material.needsUpdate=true;
+  foregroundSecondary.material.needsUpdate=true;
 
-  background.material.colorNode=sandSimulatorBackground.colorNode;
+  backgroundPrimary.material.colorNode=sandSimulatorBackground.colorNode;
+  backgroundSecondary.material.colorNode=sandSimulatorForeground.colorNode;
+  backgroundPrimary.material.needsUpdate=true;
+  backgroundSecondary.material.needsUpdate=true;
 
 
   camera.position.z = 2.5;
@@ -177,11 +197,6 @@ async function mainAsync(){
     if(isClearing && ALTERNATE_FIELD_ON_CLEAR){
       currentFieldIndex=(currentFieldIndex+1)%FIELD_COUNT;
       swapSandSimulators();
-      foreground.material.colorNode=sandSimulatorForeground.colorNodeForGrid;
-      background.material.colorNode=sandSimulatorBackground.colorNode;
-      // TODO: TSLのビルドが走るので、あらかじめオブジェクトを二つ用意した方がいいかもしれない。
-      foreground.material.needsUpdate=true;
-      background.material.needsUpdate=true;
       gridStartTime = time;
     }
     if(isCapturing){
