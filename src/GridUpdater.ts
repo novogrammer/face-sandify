@@ -1,4 +1,4 @@
-import { float, Fn, instanceIndex, mat3, normalLocal, positionLocal, uniform, uv, vec2, vec3, type ShaderNodeObject } from 'three/tsl';
+import { float, Fn, instanceIndex, mat3, normalLocal, positionLocal, uniform, uv, vec2, vec3 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 
@@ -30,9 +30,8 @@ const axisAngleToMat3 = Fn(( [axisInput, angleInput]: [any, any] ) => {
 });
 
 
-
 export class GridUpdater{
-  private readonly uTime:ShaderNodeObject<THREE.UniformNode<number>> = uniform(0);
+  private readonly uTime:THREE.UniformNode<number> = uniform(0);
   private readonly grid:THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
   private readonly gridSize:number;
   private readonly gridResolution:number;

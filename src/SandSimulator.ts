@@ -1,4 +1,4 @@
-import { bool, float, Fn, frameId, If, instanceIndex, int, select, dot, struct, texture, uniform, vec2, vec3, vec4, type ShaderNodeObject, mix, clamp, length, min, hash, not, fract, instancedArray, floor, uv } from 'three/tsl';
+import { bool, float, Fn, frameId, If, instanceIndex, int, select, dot, struct, texture, uniform, vec2, vec3, vec4, mix, clamp, length, min, hash, not, fract, instancedArray, floor, uv } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 import { IGNORE_SAND_TTL, SAND_SPACING, SAND_TTL_MAX, SAND_TTL_MIN, SHOW_WGSL_CODE } from './constants';
 // 
@@ -163,31 +163,31 @@ export class SandSimulator{
   private readonly storageTtlPing:FloatStorageNode;
   private readonly storageTtlPong:FloatStorageNode;
 
-  private readonly uIsCapturing:ShaderNodeObject<THREE.UniformNode<number>>;
-  private readonly uWebcamTextureSize:ShaderNodeObject<THREE.UniformNode<THREE.Vector2>>;
-  readonly _uDeltaTime:ShaderNodeObject<THREE.UniformNode<number>>;
+  private readonly uIsCapturing:THREE.UniformNode<number>;
+  private readonly uWebcamTextureSize:THREE.UniformNode<THREE.Vector2>;
+  readonly _uDeltaTime:THREE.UniformNode<number>;
   get uDeltaTime(){
     return this._uDeltaTime;
   }
 
-  private readonly uIsClearing:ShaderNodeObject<THREE.UniformNode<number>>;
-  private readonly uFieldIndex:ShaderNodeObject<THREE.UniformNode<number>>;
+  private readonly uIsClearing:THREE.UniformNode<number>;
+  private readonly uFieldIndex:THREE.UniformNode<number>;
 
-  private readonly computeNodePing:ShaderNodeObject<THREE.ComputeNode>;
-  private readonly computeNodePong:ShaderNodeObject<THREE.ComputeNode>;
+  private readonly computeNodePing:THREE.ComputeNode;
+  private readonly computeNodePong:THREE.ComputeNode;
 
-  private readonly _colorNode:ShaderNodeObject<THREE.TSL.ShaderCallNodeInternal>;
+  private readonly _colorNode:THREE.TSL.ShaderCallNodeInternal;
   get colorNode(){
     return this._colorNode;
   }
 
-  private readonly _colorNodeForGrid:ShaderNodeObject<THREE.TSL.ShaderCallNodeInternal>;
+  private readonly _colorNodeForGrid:THREE.TSL.ShaderCallNodeInternal;
   get colorNodeForGrid(){
     return this._colorNodeForGrid;
   }
 
   private isPing:boolean=true;
-  private readonly uIsPing:ShaderNodeObject<THREE.UniformNode<number>>=uniform(1);
+  private readonly uIsPing:THREE.UniformNode<number>=uniform(1);
 
   constructor(width:number,height:number,webcamTexture:THREE.Texture,webcamTextureSize:THREE.Vector2,gridUvNode:any){
     this.width=width;
