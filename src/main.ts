@@ -232,7 +232,7 @@ async function mainAsync(){
 
     foregroundUpdater.time = time - gridStartTime;
 
-    await renderer.renderAsync( scene, camera );
+    renderer.render( scene, camera );
     renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
     stats.update();
     previousTime=time;
