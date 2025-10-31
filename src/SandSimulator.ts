@@ -183,7 +183,7 @@ export class SandSimulator{
   private isPing:boolean=true;
   private readonly uIsPing:THREE.UniformNode<number>=uniform(1);
 
-  constructor(width:number,height:number,webcamTexture:THREE.Texture,webcamTextureSize:THREE.Vector2,gridUvNode:THREE.Node){
+  constructor(width:number,height:number,webcamTexture:THREE.Texture,webcamTextureSize:THREE.Vector2,gridUvNode:THREE.Node,uScale:THREE.UniformNode<number>){
     this.width=width;
     this.height=height;
     this.webcamTexture=webcamTexture;
@@ -423,7 +423,8 @@ export class SandSimulator{
         FloatStorageNode,
         FloatStorageNode,
       ])=>{
-        const cell=sampleCell(uvNode,kindStorage,luminanceStorage,ttlStorage).toVar();
+        const remappedUvNode = uvNode.sub(vec2(0.5)).mul(uScale).add(vec2(0.5)).toVar().fract();
+        const cell=sampleCell(remappedUvNode,kindStorage,luminanceStorage,ttlStorage).toVar();
         return toColor(cell);
       });
       {

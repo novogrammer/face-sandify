@@ -8,6 +8,7 @@ import './style.scss'
 import * as THREE from 'three/webgpu';
 import { getErrorMessage } from "./log_utils";
 import { GridUpdater } from "./GridUpdater";
+import { uniform } from "three/tsl";
 // import { testStructAsync } from './test_struct';
 
 function showError(message:string){
@@ -116,12 +117,14 @@ async function mainAsync(){
 
 
   const gridUvNode = foregroundUpdater.createGridUvNode();
+  const uScale = uniform(1);
   let sandSimulatorBackground = new SandSimulator(
     SAND_SIMULATOR_WIDTH,
     SAND_SIMULATOR_HEIGHT,
     webcamTexture.texture,
     webcamTexture.size.clone(),
     gridUvNode,
+    uScale,
   );
   let sandSimulatorForeground = new SandSimulator(
     SAND_SIMULATOR_WIDTH,
@@ -129,6 +132,7 @@ async function mainAsync(){
     webcamTexture.texture,
     webcamTexture.size.clone(),
     gridUvNode,
+    uScale,
   );
   function swapSandSimulators(){
     [sandSimulatorForeground,sandSimulatorBackground]=[sandSimulatorBackground,sandSimulatorForeground];
