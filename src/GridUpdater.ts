@@ -1,4 +1,4 @@
-import { float, Fn, instanceIndex, mat3, normalLocal, positionLocal, uniform, vec3, type ShaderNodeObject } from 'three/tsl';
+import { float, Fn, instanceIndex, mat3, normalLocal, positionLocal, uniform, uv, vec2, vec3, type ShaderNodeObject } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 
 
@@ -30,6 +30,7 @@ const axisAngleToMat3 = Fn(( [axisInput, angleInput]: [any, any] ) => {
 });
 
 
+
 export class GridUpdater{
   private readonly uTime:ShaderNodeObject<THREE.UniformNode<number>> = uniform(0);
   private readonly grid:THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
@@ -50,7 +51,7 @@ export class GridUpdater{
 
       const gridOffset = float(this.gridSize).mul(-0.5).add(cellSize.mul(0.5));
       const offsetPositionBase = vec3(ix.mul(cellSize).add(gridOffset),iy.mul(cellSize).add(gridOffset),0).toVar();
-      const offsetPosition = offsetPositionBase//.mul(this.uTime.mul(1).add(1));
+      const offsetPosition = offsetPositionBase.mul(this.uTime.mul(0.25).add(1));
       
       const time = float(this.uTime).toVar();
       const halfGravity = float(-1).mul(0.5);
@@ -66,4 +67,16 @@ export class GridUpdater{
   set time(newTime:number){
     this.uTime.value = newTime;
   }
+  createGridUvNode(){
+    return Fn(()=>{
+      const uvNode = uv().toVar();
+      const ix = float(instanceIndex.mod(this.gridResolution)).toVar();
+      const iy = float(instanceIndex.div(this.gridResolution)).toVar();
+
+      const gridUvNode=uvNode.add(vec2(ix,iy)).div(vec2(this.gridResolution)).toVar();
+
+      return gridUvNode;
+    })(); 
+  }
+
 }

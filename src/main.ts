@@ -83,24 +83,6 @@ async function mainAsync(){
     return;
   }
 
-  let sandSimulatorBackground = new SandSimulator(
-    SAND_SIMULATOR_WIDTH,
-    SAND_SIMULATOR_HEIGHT,
-    webcamTexture.texture,
-    webcamTexture.size.clone(),
-  );
-  let sandSimulatorForeground = new SandSimulator(
-    SAND_SIMULATOR_WIDTH,
-    SAND_SIMULATOR_HEIGHT,
-    webcamTexture.texture,
-    webcamTexture.size.clone(),
-  );
-  function swapSandSimulators(){
-    const temp = sandSimulatorForeground;
-    sandSimulatorForeground = sandSimulatorBackground;
-    sandSimulatorBackground = temp;
-  }
-
   let foregroundUpdater:GridUpdater;
   let foreground:THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
   {
@@ -111,7 +93,6 @@ async function mainAsync(){
     foreground.position.z = cellSize * -0.5;
     foregroundUpdater=new GridUpdater(foreground,FOREGROUND_GRID_SIZE,FOREGROUND_GRID_RESOLUTION);
   }
-  foreground.material.colorNode=sandSimulatorForeground.colorNode;
   scene.add( foreground );
 
   let background:THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
@@ -122,8 +103,33 @@ async function mainAsync(){
     });
     background = new THREE.Mesh( geometry, material );
   }
-  background.material.colorNode=sandSimulatorBackground.colorNode;
   scene.add( background );
+
+
+  const gridUvNode = foregroundUpdater.createGridUvNode();
+  let sandSimulatorBackground = new SandSimulator(
+    SAND_SIMULATOR_WIDTH,
+    SAND_SIMULATOR_HEIGHT,
+    webcamTexture.texture,
+    webcamTexture.size.clone(),
+    gridUvNode,
+  );
+  let sandSimulatorForeground = new SandSimulator(
+    SAND_SIMULATOR_WIDTH,
+    SAND_SIMULATOR_HEIGHT,
+    webcamTexture.texture,
+    webcamTexture.size.clone(),
+    gridUvNode,
+  );
+  function swapSandSimulators(){
+    const temp = sandSimulatorForeground;
+    sandSimulatorForeground = sandSimulatorBackground;
+    sandSimulatorBackground = temp;
+  }
+
+  foreground.material.colorNode=sandSimulatorForeground.colorNodeForGrid;
+
+  background.material.colorNode=sandSimulatorBackground.colorNode;
 
 
   camera.position.z = 2.5;
@@ -171,7 +177,7 @@ async function mainAsync(){
     if(isClearing && ALTERNATE_FIELD_ON_CLEAR){
       currentFieldIndex=(currentFieldIndex+1)%FIELD_COUNT;
       swapSandSimulators();
-      foreground.material.colorNode=sandSimulatorForeground.colorNode;
+      foreground.material.colorNode=sandSimulatorForeground.colorNodeForGrid;
       background.material.colorNode=sandSimulatorBackground.colorNode;
       // TODO: TSLのビルドが走るので、あらかじめオブジェクトを二つ用意した方がいいかもしれない。
       foreground.material.needsUpdate=true;
@@ -181,9 +187,6 @@ async function mainAsync(){
     if(isCapturing){
       webcamTexture.capture();
     }
-
-    // cube.rotation.x += 0.01;
-    // cube.rotation.y += 0.01;
 
     const iterationPerFrame=Math.min(
       ITERATION_PER_STEP_MAX,

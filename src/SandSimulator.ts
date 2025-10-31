@@ -181,11 +181,15 @@ export class SandSimulator{
     return this._colorNode;
   }
 
+  private readonly _colorNodeForGrid:ShaderNodeObject<THREE.TSL.ShaderCallNodeInternal>;
+  get colorNodeForGrid(){
+    return this._colorNodeForGrid;
+  }
 
   private isPing:boolean=true;
   private readonly uIsPing:ShaderNodeObject<THREE.UniformNode<number>>=uniform(1);
 
-  constructor(width:number,height:number,webcamTexture:THREE.Texture,webcamTextureSize:THREE.Vector2){
+  constructor(width:number,height:number,webcamTexture:THREE.Texture,webcamTextureSize:THREE.Vector2,gridUvNode:any){
     this.width=width;
     this.height=height;
     this.webcamTexture=webcamTexture;
@@ -435,21 +439,33 @@ export class SandSimulator{
       });
     });
 
-    const colorFn = Fn(([
-      kindStorage,
-      luminanceStorage,
-      ttlStorage,
-    ]:[
-      FloatStorageNode,
-      FloatStorageNode,
-      FloatStorageNode,
-    ])=>{
-      const cell=sampleCell(uv(),kindStorage,luminanceStorage,ttlStorage).toVar();
-      return toColor(cell);
-    });
-    const colorNodePing=colorFn(this.storageKindPong,this.storageLuminancePong,this.storageTtlPong);
-    const colorNodePong=colorFn(this.storageKindPing,this.storageLuminancePing,this.storageTtlPing);
-    this._colorNode=select(this.uIsPing.notEqual(0),colorNodePing,colorNodePong);
+    {
+      const colorFn = Fn(([
+        uvNode,
+        kindStorage,
+        luminanceStorage,
+        ttlStorage,
+      ]:[
+        any,
+        FloatStorageNode,
+        FloatStorageNode,
+        FloatStorageNode,
+      ])=>{
+        const cell=sampleCell(uvNode,kindStorage,luminanceStorage,ttlStorage).toVar();
+        return toColor(cell);
+      });
+      {
+        const colorNodePing=colorFn(uv(),this.storageKindPong,this.storageLuminancePong,this.storageTtlPong);
+        const colorNodePong=colorFn(uv(),this.storageKindPing,this.storageLuminancePing,this.storageTtlPing);
+        this._colorNode=select(this.uIsPing.notEqual(0),colorNodePing,colorNodePong);
+      }
+      {
+        const colorNodePing=colorFn(gridUvNode,this.storageKindPong,this.storageLuminancePong,this.storageTtlPong);
+        const colorNodePong=colorFn(gridUvNode,this.storageKindPing,this.storageLuminancePing,this.storageTtlPing);
+        this._colorNodeForGrid=select(this.uIsPing.notEqual(0),colorNodePing,colorNodePong);
+      }
+
+    }
   }
   toggleTexture(){
     this.isPing=!this.isPing;
