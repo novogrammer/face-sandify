@@ -183,7 +183,7 @@ export class SandSimulator{
   private isPing:boolean=true;
   private readonly uIsPing:THREE.UniformNode<number>=uniform(1);
 
-  constructor(width:number,height:number,webcamTexture:THREE.Texture,webcamTextureSize:THREE.Vector2,gridUvNode:any){
+  constructor(width:number,height:number,webcamTexture:THREE.Texture,webcamTextureSize:THREE.Vector2,gridUvNode:THREE.Node){
     this.width=width;
     this.height=height;
     this.webcamTexture=webcamTexture;
@@ -418,7 +418,7 @@ export class SandSimulator{
         luminanceStorage,
         ttlStorage,
       ]:[
-        any,
+        THREE.Node,
         FloatStorageNode,
         FloatStorageNode,
         FloatStorageNode,

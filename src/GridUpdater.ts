@@ -2,9 +2,8 @@ import { float, Fn, instanceIndex, mat3, normalLocal, positionLocal, uniform, uv
 import * as THREE from 'three/webgpu';
 
 
-const mat3Node = (...values: any[]) => (mat3 as unknown as (...args: any[]) => any)(...values);
 
-const axisAngleToMat3 = Fn(( [axisInput, angleInput]: [any, any] ) => {
+const axisAngleToMat3 = Fn(( [axisInput, angleInput]: [THREE.Node, THREE.Node] ) => {
   const axis = axisInput.normalize().toVar();
   const angle = angleInput;
 
@@ -16,7 +15,7 @@ const axisAngleToMat3 = Fn(( [axisInput, angleInput]: [any, any] ) => {
   const uy = axis.y;
   const uz = axis.z;
 
-  return mat3Node(
+  return mat3(
     cosTheta.add(oneMinusCos.mul(ux.mul(ux))),
     oneMinusCos.mul(uy.mul(ux)).add(sinTheta.mul(uz)),
     oneMinusCos.mul(uz.mul(ux)).sub(sinTheta.mul(uy)),
