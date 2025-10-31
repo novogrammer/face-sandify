@@ -234,12 +234,11 @@ export class SandSimulator{
         const offset = offsetOriginal.mul(useLeftFactor).toVar("offset");
         const uvNeighbor = coord.add(offset).add(vec2(width, height)).mod(vec2(width, height)).toVar("uvNeighbor");
         const neighborIndex=int(uvNeighbor.y.mul(float(width)).add(uvNeighbor.x)).toVar("neighborIndex");
-        const cell = Cell({
-          // @ts-ignore
-          kind:int(kindInput.element(neighborIndex)),
-          luminance:luminanceInput.element(neighborIndex),
-          ttl:ttlInput.element(neighborIndex),
-        }).toVar("cell");
+        const cell = Cell(
+          int(kindInput.element(neighborIndex)),
+          luminanceInput.element(neighborIndex),
+          ttlInput.element(neighborIndex),
+        ).toVar("cell");
         return cell;
 
       }).setLayout({
@@ -278,12 +277,11 @@ export class SandSimulator{
       const cellSecondSideDown = cellFirstSideUp.toVar("cellSecondSideDown");
 
       const cellNext = Cell().toVar("cellNext");
-      const cellAir = Cell({
-        // @ts-ignore
-        kind:KIND_AIR,
-        luminance:float(0),
-        ttl:float(0),
-      }).toVar("cellAir");
+      const cellAir = Cell(
+        KIND_AIR,
+        float(0),
+        float(0),
+      ).toVar("cellAir");
 
       cellNext.assign(cellSelf);
 
@@ -336,19 +334,17 @@ export class SandSimulator{
       If(bool(this.uIsClearing),()=>{
         const kindNew=makeNewField(uv,float(width),int(this.uFieldIndex)).toVar("kindNew");
         If(kindNew.equal(KIND_WALL),()=>{
-          cellNext.assign(Cell({
-            // @ts-ignore
-            kind:KIND_WALL,
-            luminance:texture(this.webcamTexture,uvWebcam).r,
-            ttl:float(0),
-          }));
+          cellNext.assign(Cell(
+            KIND_WALL,
+            texture(this.webcamTexture,uvWebcam).r,
+            float(0),
+          ));
         }).ElseIf(kindNew.equal(KIND_SINK),()=>{
-          cellNext.assign(Cell({
-            // @ts-ignore
-            kind:KIND_SINK,
-            luminance:texture(this.webcamTexture,uvWebcam).r,
-            ttl:float(0),
-          }));
+          cellNext.assign(Cell(
+            KIND_SINK,
+            texture(this.webcamTexture,uvWebcam).r,
+            float(0),
+          ));
         }).Else(()=>{
           cellNext.assign(cellAir);
         });
@@ -359,12 +355,11 @@ export class SandSimulator{
         If(uv.sub(CAPTURE_POINT).length().lessThanEqual(CAPTURE_RADIUS),()=>{
           If(int(coord.x).mod(int(SAND_SPACING)).add(int(coord.y).mod(int(SAND_SPACING))).equal(int(0)),()=>{
             const ttl=mix(float(SAND_TTL_MIN),float(SAND_TTL_MAX),hash(uv.mul(100)));
-            cellNext.assign(Cell({
-              // @ts-ignore
-              kind:KIND_SAND,
-              luminance:texture(this.webcamTexture,uvWebcam).r,
-              ttl:ttl,
-            }));
+            cellNext.assign(Cell(
+              KIND_SAND,
+              texture(this.webcamTexture,uvWebcam).r,
+              ttl,
+            ));
           });
         });
       });
@@ -409,14 +404,11 @@ export class SandSimulator{
       const ix=int(clamp(scaled.x,0.0,float(width-1))).toVar();
       const iy=int(clamp(scaled.y,0.0,float(height-1))).toVar();
       const index=iy.mul(int(width)).add(ix).toVar();
-      return Cell({
-        // @ts-ignore
-        kind:int(kindStorage.element(index)),
-        // @ts-ignore
-        luminance:luminanceStorage.element(index),
-        // @ts-ignore
-        ttl:ttlStorage.element(index),
-      });
+      return Cell(
+        int(kindStorage.element(index)),
+        luminanceStorage.element(index),
+        ttlStorage.element(index),
+      );
     });
 
     {
