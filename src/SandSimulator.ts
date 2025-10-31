@@ -24,15 +24,11 @@ type FloatStorageNode = ReturnType<typeof instancedArray>;
 
 const toColor = Fn(([cell]:[ReturnType<typeof Cell>])=>{
   const rgb=vec3(1.0).toVar();
-  // @ts-ignore
   const luminance=cell.get("luminance").toVar();
-  // @ts-ignore
   If(cell.get("kind").equal(KIND_WALL),()=>{
     rgb.assign(mix(vec3(0.0,0.0,0.5),vec3(0.0,1.0,1.0),luminance));
-    // @ts-ignore
   }).ElseIf(cell.get("kind").equal(KIND_SAND),()=>{
     rgb.assign(mix(vec3(0.75,0.0,0.0),vec3(1.0,0.75,0.0),luminance));
-    // @ts-ignore
   }).ElseIf(cell.get("kind").equal(KIND_SINK),()=>{
     rgb.assign(mix(vec3(0.75,0.0,0.0),vec3(1.0,0.0,0.0),luminance));
   }).Else(()=>{
@@ -66,9 +62,7 @@ const distPointSegment=Fn(([p,a,b]:[ReturnType<typeof vec2>,ReturnType<typeof ve
 });
 
 const isAirLikeCell=Fn(([cell]:[ReturnType<typeof Cell>])=>{
-  // @ts-ignore
   const isAir=bool(cell.get("kind").equal(KIND_AIR))/*.toVar("isAir")*/;
-  // @ts-ignore
   const isSink=bool(cell.get("kind").equal(KIND_SINK))/*.toVar("isSink")*/;
   return isAir.or(isSink);
 })/*.setLayout({
@@ -243,9 +237,7 @@ export class SandSimulator{
         const cell = Cell({
           // @ts-ignore
           kind:int(kindInput.element(neighborIndex)),
-          // @ts-ignore
           luminance:luminanceInput.element(neighborIndex),
-          // @ts-ignore
           ttl:ttlInput.element(neighborIndex),
         }).toVar("cell");
         return cell;
@@ -299,20 +291,16 @@ export class SandSimulator{
       If(isAirLikeCell(cellSelf),()=>{
         // watch up
 
-        // @ts-ignore
         If(cellUp.get("kind").equal(KIND_SAND),()=>{
           cellNext.assign(cellUp);
-          // @ts-ignore
         }).ElseIf(bool(cellFirstDiagonalUp.get("kind").equal(KIND_SAND)).and(not(isAirLikeCell(cellFirstSideUp))),()=>{
           cellNext.assign(cellFirstDiagonalUp);
-          // @ts-ignore
         }).ElseIf(bool(cellSecondDiagonalUp.get("kind").equal(KIND_SAND)).and(not(isAirLikeCell(cellSecondSideUp))),()=>{
           cellNext.assign(cellSecondDiagonalUp);
         }).Else(()=>{
           // DO NOTHING
         });
 
-        // @ts-ignore
       }).ElseIf(cellSelf.get("kind").equal(KIND_SAND), ()=>{
         // watch down
 
@@ -330,17 +318,13 @@ export class SandSimulator{
       });
 
       // SINKは素通りさせてから消す
-      // @ts-ignore
       If(cellNext.get("kind").equal(KIND_SAND),()=>{
-        // @ts-ignore
         If(cellSelf.get("kind").equal(KIND_SINK),()=>{
           // SINKで上書きすることで砂を消す
           cellNext.assign(cellSelf);
         }).Else(()=>{
-          // @ts-ignore
           const ttl=cellNext.get("ttl").sub(IGNORE_SAND_TTL?0:this.uDeltaTime);
           If(ttl.greaterThan(0),()=>{
-            // @ts-ignore
             cellNext.get("ttl").assign(ttl);
           }).Else(()=>{
             cellNext.assign(cellAir);
@@ -358,7 +342,6 @@ export class SandSimulator{
             luminance:texture(this.webcamTexture,uvWebcam).r,
             ttl:float(0),
           }));
-          // @ts-ignore
         }).ElseIf(kindNew.equal(KIND_SINK),()=>{
           cellNext.assign(Cell({
             // @ts-ignore
@@ -388,11 +371,8 @@ export class SandSimulator{
 
       const selfIndex=int(coord.y.mul(float(width)).add(coord.x)).toVar("selfIndex");
       // 結果を書き込み
-      // @ts-ignore
       kindOutput.element(selfIndex).assign(float(cellNext.get("kind")));
-      // @ts-ignore
       luminanceOutput.element(selfIndex).assign(cellNext.get("luminance"));
-      // @ts-ignore
       ttlOutput.element(selfIndex).assign(cellNext.get("ttl"));
     });  
 
