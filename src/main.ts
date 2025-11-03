@@ -1,5 +1,5 @@
 import Stats from "stats-gl";
-import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERATION_PER_SEC, ITERATION_PER_STEP_MAX, CAPTURE_CYCLE_DURATION, CLEAR_CYCLE_DURATION, FIELD_COUNT, ALTERNATE_FIELD_ON_CLEAR, FOREGROUND_GRID_SIZE, FOREGROUND_GRID_RESOLUTION } from './constants';
+import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERATION_PER_SEC, ITERATION_PER_STEP_MAX, CAPTURE_CYCLE_DURATION, CLEAR_CYCLE_DURATION, FIELD_COUNT, ALTERNATE_FIELD_ON_CLEAR, FOREGROUND_GRID_SIZE, FOREGROUND_GRID_RESOLUTION, IS_DEBUG } from './constants';
 import { getElementSize, querySelectorOrThrow } from './dom_utils';
 import { SandSimulator } from './SandSimulator';
 import { WebcamCanvasTexture } from './WebcamCanvasTexture';
@@ -46,9 +46,11 @@ async function mainAsync(){
     });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize( width, height );
-    const inspector = new Inspector();
-    renderer.inspector = inspector;
-    inspector.domElement.style.pointerEvents="auto";
+    if(IS_DEBUG){
+      const inspector = new Inspector();
+      renderer.inspector = inspector;
+      inspector.domElement.style.pointerEvents="auto";
+    }
     renderer.domElement.classList.add("p-background__canvas");
     backgroundElement.appendChild( renderer.domElement );
     await renderer.init();
@@ -63,15 +65,19 @@ async function mainAsync(){
     return;
   }
   
-  const stats=new Stats({
-    precision:3,
-    trackHz: true,
-    trackGPU: true,
-    trackCPT: true,
-  });
-  stats.init( renderer );
-  stats.dom.style.top="0px";
-  document.body.appendChild( stats.dom );
+  let stats:Stats|undefined;
+  if(IS_DEBUG){
+    stats=new Stats({
+      precision:3,
+      trackHz: true,
+      trackGPU: true,
+      trackCPT: true,
+    });
+    stats.init( renderer );
+    stats.dom.style.top="0px";
+    document.body.appendChild( stats.dom );
+
+  }
 
 
 
@@ -227,7 +233,9 @@ async function mainAsync(){
         await sandSimulatorBackground.updateFrameAsync(renderer,false,false,currentFieldIndex);
       }
     }
-    renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
+    if(stats){
+      renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
+    }
 
     // {
     //   const rawShader = await renderer.debug.getShaderAsync( scene, camera, cube );
@@ -238,8 +246,10 @@ async function mainAsync(){
     foregroundUpdater.time = time - gridStartTime;
 
     renderer.render( scene, camera );
-    renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
-    stats.update();
+    if(stats){
+      renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
+      stats.update();
+    }
     previousTime=time;
     isComputing=false;
   }
