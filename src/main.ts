@@ -9,7 +9,7 @@ import * as THREE from 'three/webgpu';
 import { getErrorMessage } from "./log_utils";
 import { GridUpdater } from "./GridUpdater";
 import { uniform } from "three/tsl";
-// import { testStructAsync } from './test_struct';
+import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 function showError(message:string){
   const errorElement=querySelectorOrThrow<HTMLElement>(".p-error");
@@ -46,6 +46,11 @@ async function mainAsync(){
     });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize( width, height );
+    const inspector = new Inspector();
+    renderer.inspector = inspector;
+    inspector.domElement.style.pointerEvents="auto";
+    renderer.domElement.classList.add("p-background__canvas");
+    backgroundElement.appendChild( renderer.domElement );
     await renderer.init();
     const isWebGPUBackend = !!((renderer.backend as any)?.isWebGPUBackend);
     if(!isWebGPUBackend){
@@ -57,8 +62,7 @@ async function mainAsync(){
     console.error(error);
     return;
   }
-  renderer.domElement.classList.add("p-background__canvas");
-  backgroundElement.appendChild( renderer.domElement );
+  
   const stats=new Stats({
     precision:3,
     trackHz: true,
@@ -117,6 +121,7 @@ async function mainAsync(){
 
 
   const gridUvNode = foregroundUpdater.createGridUvNode();
+  // (max/min)倍する
   const uScale = uniform(1);
   let sandSimulatorBackground = new SandSimulator(
     SAND_SIMULATOR_WIDTH,
