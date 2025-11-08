@@ -189,18 +189,12 @@ async function mainAsync(){
   //   console.error(error);
   // })
 
-  let isComputing=false;
   let previousTime=-0.001;
   let gridStartTime=0;
   let currentFieldIndex=0;
 
   renderer.setAnimationLoop( animate );
-  async function animate(){
-    if(isComputing){
-      console.log("skip");
-      return;
-    }
-    isComputing=true;
+  function animate(){
     const time=performance.now()*0.001;
 
     const deltaTime = time - previousTime;
@@ -227,10 +221,10 @@ async function mainAsync(){
     for(let i=0;i<iterationPerFrame;i++){
       if(i==0){
         sandSimulatorBackground.uDeltaTime.value=deltaTime;
-        await sandSimulatorBackground.updateFrameAsync(renderer,isCapturing,isClearing,currentFieldIndex);
+        sandSimulatorBackground.updateFrame(renderer,isCapturing,isClearing,currentFieldIndex);
       }else{
         sandSimulatorBackground.uDeltaTime.value=0;
-        await sandSimulatorBackground.updateFrameAsync(renderer,false,false,currentFieldIndex);
+        sandSimulatorBackground.updateFrame(renderer,false,false,currentFieldIndex);
       }
     }
     if(stats){
@@ -251,7 +245,6 @@ async function mainAsync(){
       stats.update();
     }
     previousTime=time;
-    isComputing=false;
   }
 
 }

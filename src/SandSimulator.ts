@@ -446,7 +446,7 @@ export class SandSimulator{
   }
 
 
-  async updateFrameAsync(renderer:THREE.WebGPURenderer,isCapturing:boolean,isClearing:boolean,fieldIndex:number) {  
+  updateFrame(renderer:THREE.WebGPURenderer,isCapturing:boolean,isClearing:boolean,fieldIndex:number) {  
     this.toggleTexture();
 
 
@@ -466,7 +466,7 @@ export class SandSimulator{
       console.log((renderer as any)._nodes.getForCompute(computeNode).computeShader);
       debugger;
     }
-    await renderer.computeAsync(computeNode);  
+    renderer.compute(computeNode);
 
       
 
