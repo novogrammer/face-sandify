@@ -15,7 +15,7 @@
     "vite": "^7.1.7"
   },
   "dependencies": {
-    "stats-gl": "^3.6.0",
+    "stats-gl": "^3.7.0",
     "three": "^0.181.0"
   }
 }
