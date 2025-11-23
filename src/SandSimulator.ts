@@ -37,10 +37,10 @@ const toColor = Fn(([cell]:[ReturnType<typeof Cell>])=>{
   return vec4(rgb,1.0);
 });
 const distPointSegment=Fn(([p,a,b]:[ReturnType<typeof vec2>,ReturnType<typeof vec2>,ReturnType<typeof vec2>])=>{
-  const pa = p.sub(a).toVar();
-  const ba = b.sub(a).toVar();
-  const t = clamp(dot(pa,ba).div(dot(ba,ba)),0.0,1.0).toVar();
-  const proj = a.add(ba.mul(t)).toVar();
+  const pa = p.sub(a).toVar("pa");
+  const ba = b.sub(a).toVar("ba");
+  const t = clamp(dot(pa,ba).div(dot(ba,ba)),0.0,1.0).toVar("t");
+  const proj = a.add(ba.mul(t)).toVar("proj");
   return length(p.sub(proj));
 }).setLayout({
   name:"distPointSegment",
@@ -78,45 +78,40 @@ const isAirLikeCell=Fn(([cell]:[ReturnType<typeof Cell>])=>{
 
 const makeNewField=Fn(([uv,width,fieldIndex]:[ReturnType<typeof vec2>,ReturnType<typeof int>,ReturnType<typeof float>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
+  const thickness=float(3).div(width).toVar("thickness");
   If(fieldIndex.equal(int(0)),()=>{
     // フィールド0: 既存の斜めライン + 左右のシンク
     {
-      const thickness=float(3).div(width).toVar();
-      const distance=min(
+      If(min(
         distPointSegment(uv,vec2(0.3,0.90),vec2(0.5,0.95)),
         distPointSegment(uv,vec2(0.7,0.90),vec2(0.5,0.95)),
         distPointSegment(uv,vec2(0.3,0.15),vec2(0.45,0.1)),
         distPointSegment(uv,vec2(0.7,0.15),vec2(0.55,0.1)),
         distPointSegment(uv,vec2(0.3,0.15),vec2(0.15,0.1)),
         distPointSegment(uv,vec2(0.7,0.15),vec2(0.85,0.1)),
-      );
-      If(distance.lessThanEqual(thickness),()=>{
+      ).lessThanEqual(thickness),()=>{
         kindNew.assign(KIND_WALL);
       });
     }
     {
-      const thickness=float(3).div(width).toVar();
-      const distance=min(
+      If(min(
         distPointSegment(uv,vec2(0.15,0.5),vec2(0,0.5)),
         distPointSegment(uv,vec2(0.85,0.5),vec2(1,0.5)),
-      );
-      If(distance.lessThanEqual(thickness),()=>{
+      ).lessThanEqual(thickness),()=>{
         kindNew.assign(KIND_SINK);
       });
     }
   }).ElseIf(fieldIndex.equal(int(1)),()=>{
     // フィールド1: バケツ
     {
-      const thickness=float(3).div(width).toVar();
-      const distance=min(
+      If(min(
         // 下辺
         distPointSegment(uv,vec2(0.1,0.05),vec2(0.9,0.05)),
         // 左辺
         distPointSegment(uv,vec2(0.1,0.05),vec2(0.0,0.9)),
         // 右辺
         distPointSegment(uv,vec2(0.9,0.05),vec2(1.0,0.9)),
-      );
-      If(distance.lessThanEqual(thickness),()=>{
+      ).lessThanEqual(thickness),()=>{
         kindNew.assign(KIND_WALL);
       });
     }
@@ -198,11 +193,11 @@ export class SandSimulator{
     this.storageTtlPong=createFloatStorage("ttlPong");
     
 
-    this.uIsCapturing=uniform(0);
-    this.uWebcamTextureSize=uniform(webcamTextureSize);
-    this._uDeltaTime=uniform(0);
-    this.uIsClearing=uniform(0);
-    this.uFieldIndex=uniform(0);
+    this.uIsCapturing=uniform(0).setName("uIsCapturing");
+    this.uWebcamTextureSize=uniform(webcamTextureSize).setName("uWebcamTextureSize");
+    this._uDeltaTime=uniform(0).setName("uDeltaTime");
+    this.uIsClearing=uniform(0).setName("uIsClearing");
+    this.uFieldIndex=uniform(0).setName("uFieldIndex");
 
     // コンピュートシェーダーの定義
     const computeShader = Fn(([
