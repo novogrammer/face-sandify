@@ -85,45 +85,83 @@ const isAirLikeCell=Fn(([cell]:[ReturnType<typeof Cell>])=>{
   ],
 });
 
-const makeNewField=Fn(([uv,width,fieldIndex]:[ReturnType<typeof vec2>,ReturnType<typeof int>,ReturnType<typeof float>])=>{
+const makeNewFieldA=Fn(([uv,width]:[ReturnType<typeof vec2>,ReturnType<typeof int>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
   const thickness=float(3).div(width).toVar("thickness");
+  // フィールド0: 既存の斜めライン + 左右のシンク
+  {
+    If(min(
+      distPointSegment(uv,vec2(0.3,0.90),vec2(0.5,0.95)),
+      distPointSegment(uv,vec2(0.7,0.90),vec2(0.5,0.95)),
+      distPointSegment(uv,vec2(0.3,0.15),vec2(0.45,0.1)),
+      distPointSegment(uv,vec2(0.7,0.15),vec2(0.55,0.1)),
+      distPointSegment(uv,vec2(0.3,0.15),vec2(0.15,0.1)),
+      distPointSegment(uv,vec2(0.7,0.15),vec2(0.85,0.1)),
+    ).lessThanEqual(thickness),()=>{
+      kindNew.assign(KIND_WALL);
+    });
+  }
+  {
+    If(min(
+      distPointSegment(uv,vec2(0.15,0.5),vec2(0,0.5)),
+      distPointSegment(uv,vec2(0.85,0.5),vec2(1,0.5)),
+    ).lessThanEqual(thickness),()=>{
+      kindNew.assign(KIND_SINK);
+    });
+  }
+  return kindNew;
+}).setLayout({
+  name:"makeNewFieldA",
+  type:"int",
+  inputs:[
+    {
+      name:"uv",
+      type:"vec2",
+    },
+    {
+      name:"width",
+      type:"float",
+    },
+  ],
+});
+const makeNewFieldB=Fn(([uv,width]:[ReturnType<typeof vec2>,ReturnType<typeof int>])=>{
+  const kindNew=KIND_AIR.toVar("kindNew");
+  const thickness=float(3).div(width).toVar("thickness");
+  // フィールド1: バケツ
+  {
+    If(min(
+      // 下辺
+      distPointSegment(uv,vec2(0.1,0.05),vec2(0.9,0.05)),
+      // 左辺
+      distPointSegment(uv,vec2(0.1,0.05),vec2(0.0,0.9)),
+      // 右辺
+      distPointSegment(uv,vec2(0.9,0.05),vec2(1.0,0.9)),
+    ).lessThanEqual(thickness),()=>{
+      kindNew.assign(KIND_WALL);
+    });
+  }
+  return kindNew;
+}).setLayout({
+  name:"makeNewFieldB",
+  type:"int",
+  inputs:[
+    {
+      name:"uv",
+      type:"vec2",
+    },
+    {
+      name:"width",
+      type:"float",
+    },
+  ],
+});
+
+const makeNewField=Fn(([uv,width,fieldIndex]:[ReturnType<typeof vec2>,ReturnType<typeof int>,ReturnType<typeof float>])=>{
+  const kindNew=KIND_AIR.toVar("kindNew");
   If(fieldIndex.equal(int(0)),()=>{
-    // フィールド0: 既存の斜めライン + 左右のシンク
-    {
-      If(min(
-        distPointSegment(uv,vec2(0.3,0.90),vec2(0.5,0.95)),
-        distPointSegment(uv,vec2(0.7,0.90),vec2(0.5,0.95)),
-        distPointSegment(uv,vec2(0.3,0.15),vec2(0.45,0.1)),
-        distPointSegment(uv,vec2(0.7,0.15),vec2(0.55,0.1)),
-        distPointSegment(uv,vec2(0.3,0.15),vec2(0.15,0.1)),
-        distPointSegment(uv,vec2(0.7,0.15),vec2(0.85,0.1)),
-      ).lessThanEqual(thickness),()=>{
-        kindNew.assign(KIND_WALL);
-      });
-    }
-    {
-      If(min(
-        distPointSegment(uv,vec2(0.15,0.5),vec2(0,0.5)),
-        distPointSegment(uv,vec2(0.85,0.5),vec2(1,0.5)),
-      ).lessThanEqual(thickness),()=>{
-        kindNew.assign(KIND_SINK);
-      });
-    }
+    kindNew.assign(makeNewFieldA(uv,width));
   }).ElseIf(fieldIndex.equal(int(1)),()=>{
-    // フィールド1: バケツ
-    {
-      If(min(
-        // 下辺
-        distPointSegment(uv,vec2(0.1,0.05),vec2(0.9,0.05)),
-        // 左辺
-        distPointSegment(uv,vec2(0.1,0.05),vec2(0.0,0.9)),
-        // 右辺
-        distPointSegment(uv,vec2(0.9,0.05),vec2(1.0,0.9)),
-      ).lessThanEqual(thickness),()=>{
-        kindNew.assign(KIND_WALL);
-      });
-    }
+    kindNew.assign(makeNewFieldB(uv,width));
   }).Else(()=>{
     // DO NOTHING
   });
