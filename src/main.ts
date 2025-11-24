@@ -1,5 +1,5 @@
 import Stats from "stats-gl";
-import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERATION_PER_SEC, ITERATION_PER_STEP_MAX, CAPTURE_CYCLE_DURATION, CLEAR_CYCLE_DURATION, FIELD_COUNT, ALTERNATE_FIELD_ON_CLEAR, FOREGROUND_GRID_SIZE, FOREGROUND_GRID_RESOLUTION, IS_DEBUG } from './constants';
+import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERATION_PER_SEC, ITERATION_PER_STEP_MAX, CAPTURE_CYCLE_DURATION, CLEAR_CYCLE_DURATION, FIELD_COUNT, ALTERNATE_FIELD_ON_CLEAR, FOREGROUND_GRID_SIZE, FOREGROUND_GRID_RESOLUTION, IS_DEBUG, SHOW_WGSL_CODE } from './constants';
 import { getElementSize, querySelectorOrThrow } from './dom_utils';
 import { SandSimulator } from './SandSimulator';
 import { WebcamCanvasTexture } from './WebcamCanvasTexture';
@@ -78,10 +78,6 @@ async function mainAsync(){
     document.body.appendChild( stats.dom );
 
   }
-
-
-
-
 
   const webcamVideoElement = querySelectorOrThrow<HTMLVideoElement>(".p-webcam-video");
   let webcamTexture:WebcamCanvasTexture;
@@ -166,6 +162,11 @@ async function mainAsync(){
   backgroundPrimary.material.needsUpdate=true;
   backgroundSecondary.material.needsUpdate=true;
 
+  if(SHOW_WGSL_CODE){
+    const rawShader = await renderer.debug.getShaderAsync( scene, camera, backgroundPrimary );
+    console.log(rawShader.fragmentShader);
+
+  }
 
   camera.position.z = 2.5;
 

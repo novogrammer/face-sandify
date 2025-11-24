@@ -23,8 +23,8 @@ const Cell = struct({
 type FloatStorageNode = ReturnType<typeof instancedArray>;
 
 const toColor = Fn(([cell]:[ReturnType<typeof Cell>])=>{
-  const rgb=vec3(1.0).toVar();
-  const luminance=cell.get("luminance").toVar();
+  const rgb=vec3(1.0).toVar("rgb");
+  const luminance=cell.get("luminance").toVar("luminance");
   If(cell.get("kind").equal(KIND_WALL),()=>{
     rgb.assign(mix(vec3(0.0,0.0,0.5),vec3(0.0,1.0,1.0),luminance));
   }).ElseIf(cell.get("kind").equal(KIND_SAND),()=>{
@@ -35,6 +35,15 @@ const toColor = Fn(([cell]:[ReturnType<typeof Cell>])=>{
     rgb.assign(vec3(0.0));
   })
   return vec4(rgb,1.0);
+}).setLayout({
+  name:"toColor",
+  type:"vec4",
+  inputs:[
+    {
+      name:"cell",
+      type:"Cell",
+    },
+  ],
 });
 const distPointSegment=Fn(([p,a,b]:[ReturnType<typeof vec2>,ReturnType<typeof vec2>,ReturnType<typeof vec2>])=>{
   const pa = p.sub(a).toVar("pa");
