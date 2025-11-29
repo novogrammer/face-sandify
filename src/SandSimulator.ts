@@ -26,11 +26,11 @@ const toColor = Fn(([cell]:[ReturnType<typeof Cell>])=>{
   const rgb=vec3(1.0).toVar("rgb");
   const luminance=cell.get("luminance").toVar("luminance");
   If(cell.get("kind").equal(KIND_WALL),()=>{
-    rgb.assign(mix(vec3(0.0,0.0,0.5),vec3(0.0,1.0,1.0),luminance));
+    rgb.assign(vec3(0.0,1.0,1.0));
   }).ElseIf(cell.get("kind").equal(KIND_SAND),()=>{
     rgb.assign(mix(vec3(0.75,0.0,0.0),vec3(1.0,0.75,0.0),luminance));
   }).ElseIf(cell.get("kind").equal(KIND_SINK),()=>{
-    rgb.assign(mix(vec3(0.75,0.0,0.0),vec3(1.0,0.0,0.0),luminance));
+    rgb.assign(vec3(1.0,0.0,0.0));
   }).Else(()=>{
     rgb.assign(vec3(0.0));
   })
@@ -374,13 +374,13 @@ export class SandSimulator{
         If(kindNew.equal(KIND_WALL),()=>{
           cellNext.assign(Cell(
             KIND_WALL,
-            texture(this.webcamTexture,uvWebcam).r,
+            float(0),
             float(0),
           ));
         }).ElseIf(kindNew.equal(KIND_SINK),()=>{
           cellNext.assign(Cell(
             KIND_SINK,
-            texture(this.webcamTexture,uvWebcam).r,
+            float(0),
             float(0),
           ));
         }).Else(()=>{
