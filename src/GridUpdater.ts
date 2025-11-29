@@ -52,7 +52,7 @@ export class GridUpdater{
       const offsetPosition = offsetPositionBase.mul(this.uTime.mul(0.25).add(1));
       
       const time = float(this.uTime).toVar();
-      const halfGravity = float(-1).mul(0.5);
+      const halfGravity = float(-2).mul(0.5);
       const movePosition = vec3(0,time.mul(time).mul(halfGravity),0);
       return orientation.mul(positionLocal).add(offsetPosition.add(movePosition));
     })();
