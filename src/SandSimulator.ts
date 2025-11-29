@@ -93,8 +93,8 @@ const makeNewFieldA=Fn(([uv,width]:[ReturnType<typeof vec2>,ReturnType<typeof in
     If(min(
       distPointSegment(uv,vec2(0.3,0.90),vec2(0.5,0.95)),
       distPointSegment(uv,vec2(0.7,0.90),vec2(0.5,0.95)),
-      distPointSegment(uv,vec2(0.3,0.15),vec2(0.45,0.1)),
-      distPointSegment(uv,vec2(0.7,0.15),vec2(0.55,0.1)),
+      distPointSegment(uv,vec2(0.3,0.15),vec2(0.49,0.1)),
+      distPointSegment(uv,vec2(0.7,0.15),vec2(0.51,0.1)),
       distPointSegment(uv,vec2(0.3,0.15),vec2(0.15,0.1)),
       distPointSegment(uv,vec2(0.7,0.15),vec2(0.85,0.1)),
     ).lessThanEqual(thickness),()=>{
