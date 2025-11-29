@@ -251,6 +251,7 @@ async function mainAsync(){
     //   console.log(rawShader);
     //   debugger;
     // }
+    uScale.value = 1 < camera.aspect ? camera.aspect : 1 / camera.aspect;
 
     foregroundUpdater.time = time - gridStartTime;
 
