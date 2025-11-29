@@ -305,18 +305,14 @@ export class SandSimulator{
 
       const cellSelf = pickCell(coord,vec2(0, 0),useLeftFactor).toVar("cellSelf");
       const cellUp = pickCell(coord,vec2(0, 1),useLeftFactor).toVar("cellUp");
-      const cellFirstDiagonalUp = pickCell(coord,vec2(-1, 1),useLeftFactor).toVar("cellFirstDiagonalUp");
-      const cellFirstSideUp = pickCell(coord,vec2(-1, 0),useLeftFactor).toVar("cellFirstSideUp");
-      const cellSecondDiagonalUp = pickCell(coord,vec2(1, 1),useLeftFactor).toVar("cellSecondDiagonalUp");
-      const cellSecondSideUp = pickCell(coord,vec2(1, 0),useLeftFactor).toVar("cellSecondSideUp");
+      const cellLeftUp = pickCell(coord,vec2(-1, 1),useLeftFactor).toVar("cellLeftUp");
+      const cellLeft = pickCell(coord,vec2(-1, 0),useLeftFactor).toVar("cellLeft");
+      const cellRightUp = pickCell(coord,vec2(1, 1),useLeftFactor).toVar("cellRightUp");
+      const cellRight = pickCell(coord,vec2(1, 0),useLeftFactor).toVar("cellRight");
 
       const cellDown = pickCell(coord,vec2(0, -1),useLeftFactor).toVar("cellDown");
-      const cellFirstDiagonalDown = pickCell(coord,vec2(1, -1),useLeftFactor).toVar("cellFirstDiagonalDown");
-      // 同じ値を参照するのでコピーする
-      const cellFirstSideDown = cellSecondSideUp.toVar("cellFirstSideDown");
-      const cellSecondDiagonalDown = pickCell(coord,vec2(-1, -1),useLeftFactor).toVar("cellSecondDiagonalDown");
-      // 同じ値を参照するのでコピーする
-      const cellSecondSideDown = cellFirstSideUp.toVar("cellSecondSideDown");
+      const cellRightDown = pickCell(coord,vec2(1, -1),useLeftFactor).toVar("cellRightDown");
+      const cellLeftDown = pickCell(coord,vec2(-1, -1),useLeftFactor).toVar("cellLeftDown");
 
       const cellNext = Cell().toVar("cellNext");
       const cellAir = Cell(
@@ -334,12 +330,12 @@ export class SandSimulator{
         If(cellUp.get("kind").equal(KIND_SAND),()=>{
           // 砂を上から移動させる
           cellNext.assign(cellUp);
-        }).ElseIf(bool(cellFirstDiagonalUp.get("kind").equal(KIND_SAND)).and(not(isAirLikeCell(cellFirstSideUp))),()=>{
-          // 砂をFirst側の斜め上から移動させる
-          cellNext.assign(cellFirstDiagonalUp);
-        }).ElseIf(bool(cellSecondDiagonalUp.get("kind").equal(KIND_SAND)).and(not(isAirLikeCell(cellSecondSideUp))),()=>{
-          // 砂をSecond側の斜め上から移動させる
-          cellNext.assign(cellSecondDiagonalUp);
+        }).ElseIf(bool(cellLeftUp.get("kind").equal(KIND_SAND)).and(not(isAirLikeCell(cellLeft))),()=>{
+          // 砂を左上から移動させる
+          cellNext.assign(cellLeftUp);
+        }).ElseIf(bool(cellRightUp.get("kind").equal(KIND_SAND)).and(not(isAirLikeCell(cellRight))),()=>{
+          // 砂を右上から移動させる
+          cellNext.assign(cellRightUp);
         }).Else(()=>{
           // DO NOTHING
         });
@@ -350,11 +346,11 @@ export class SandSimulator{
         If(isAirLikeCell(cellDown),()=>{
           // 砂を下へ移動させる
           cellNext.assign(cellAir);
-        }).ElseIf(isAirLikeCell(cellFirstDiagonalDown).and(isAirLikeCell(cellFirstSideDown)),()=>{
-          // 砂をFirst側の斜め下へ移動させる
+        }).ElseIf(isAirLikeCell(cellRightDown).and(isAirLikeCell(cellRight)),()=>{
+          // 砂を右下へ移動させる
           cellNext.assign(cellAir);
-        }).ElseIf(isAirLikeCell(cellSecondDiagonalDown).and(isAirLikeCell(cellSecondSideDown)),()=>{
-          // 砂をSecond側の斜め下へ移動させる
+        }).ElseIf(isAirLikeCell(cellLeftDown).and(isAirLikeCell(cellLeft)),()=>{
+          // 砂を左下へ移動させる
           cellNext.assign(cellAir);
         }).Else(()=>{
           // DO NOTHING
