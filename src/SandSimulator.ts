@@ -305,13 +305,13 @@ export class SandSimulator{
 
       const cellSelf = pickCell(coord,vec2(0, 0),useLeftFactor).toVar("cellSelf");
       const cellUp = pickCell(coord,vec2(0, 1),useLeftFactor).toVar("cellUp");
-      const cellLeftUp = pickCell(coord,vec2(-1, 1),useLeftFactor).toVar("cellLeftUp");
+      // const cellLeftUp = pickCell(coord,vec2(-1, 1),useLeftFactor).toVar("cellLeftUp");
       const cellLeft = pickCell(coord,vec2(-1, 0),useLeftFactor).toVar("cellLeft");
       const cellRightUp = pickCell(coord,vec2(1, 1),useLeftFactor).toVar("cellRightUp");
       const cellRight = pickCell(coord,vec2(1, 0),useLeftFactor).toVar("cellRight");
 
       const cellDown = pickCell(coord,vec2(0, -1),useLeftFactor).toVar("cellDown");
-      const cellRightDown = pickCell(coord,vec2(1, -1),useLeftFactor).toVar("cellRightDown");
+      // const cellRightDown = pickCell(coord,vec2(1, -1),useLeftFactor).toVar("cellRightDown");
       const cellLeftDown = pickCell(coord,vec2(-1, -1),useLeftFactor).toVar("cellLeftDown");
 
       const cellNext = Cell().toVar("cellNext");
@@ -330,12 +330,15 @@ export class SandSimulator{
         If(cellUp.get("kind").equal(KIND_SAND),()=>{
           // 砂を上から移動させる
           cellNext.assign(cellUp);
-        }).ElseIf(bool(cellLeftUp.get("kind").equal(KIND_SAND)).and(not(isAirLikeCell(cellLeft))),()=>{
+        })/*.ElseIf(bool(cellLeftUp.get("kind").equal(KIND_SAND)).and(not(isAirLikeCell(cellLeft))),()=>{
           // 砂を左上から移動させる
           cellNext.assign(cellLeftUp);
         }).ElseIf(bool(cellRightUp.get("kind").equal(KIND_SAND)).and(not(isAirLikeCell(cellRight))),()=>{
           // 砂を右上から移動させる
           cellNext.assign(cellRightUp);
+        })*/.ElseIf(bool(cellLeft.get("kind").equal(KIND_SAND)).and(not(isAirLikeCell(cellLeftDown))).and(isAirLikeCell(cellUp) ),()=>{
+          // 砂を左から移動させる
+          cellNext.assign(cellLeft);
         }).Else(()=>{
           // DO NOTHING
         });
@@ -346,11 +349,14 @@ export class SandSimulator{
         If(isAirLikeCell(cellDown),()=>{
           // 砂を下へ移動させる
           cellNext.assign(cellAir);
-        }).ElseIf(isAirLikeCell(cellRightDown).and(isAirLikeCell(cellRight)),()=>{
+        })/*.ElseIf(isAirLikeCell(cellRightDown).and(isAirLikeCell(cellRight)),()=>{
           // 砂を右下へ移動させる
           cellNext.assign(cellAir);
         }).ElseIf(isAirLikeCell(cellLeftDown).and(isAirLikeCell(cellLeft)),()=>{
           // 砂を左下へ移動させる
+          cellNext.assign(cellAir);
+        })*/.ElseIf(isAirLikeCell(cellRight).and(not(isAirLikeCell(cellDown))).and(isAirLikeCell(cellRightUp)),()=>{
+          // 砂を右へ移動させる
           cellNext.assign(cellAir);
         }).Else(()=>{
           // DO NOTHING
