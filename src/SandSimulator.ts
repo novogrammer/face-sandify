@@ -332,10 +332,13 @@ export class SandSimulator{
         // watch up
 
         If(cellUp.get("kind").equal(KIND_SAND),()=>{
+          // 砂を上から移動させる
           cellNext.assign(cellUp);
         }).ElseIf(bool(cellFirstDiagonalUp.get("kind").equal(KIND_SAND)).and(not(isAirLikeCell(cellFirstSideUp))),()=>{
+          // 砂をFirst側の斜め上から移動させる
           cellNext.assign(cellFirstDiagonalUp);
         }).ElseIf(bool(cellSecondDiagonalUp.get("kind").equal(KIND_SAND)).and(not(isAirLikeCell(cellSecondSideUp))),()=>{
+          // 砂をSecond側の斜め上から移動させる
           cellNext.assign(cellSecondDiagonalUp);
         }).Else(()=>{
           // DO NOTHING
@@ -345,10 +348,13 @@ export class SandSimulator{
         // watch down
 
         If(isAirLikeCell(cellDown),()=>{
+          // 砂を下へ移動させる
           cellNext.assign(cellAir);
         }).ElseIf(isAirLikeCell(cellFirstDiagonalDown).and(isAirLikeCell(cellFirstSideDown)),()=>{
+          // 砂をFirst側の斜め下へ移動させる
           cellNext.assign(cellAir);
         }).ElseIf(isAirLikeCell(cellSecondDiagonalDown).and(isAirLikeCell(cellSecondSideDown)),()=>{
+          // 砂をSecond側の斜め下へ移動させる
           cellNext.assign(cellAir);
         }).Else(()=>{
           // DO NOTHING
