@@ -1,5 +1,5 @@
 import Stats from "stats-gl";
-import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERATION_PER_SEC, ITERATION_PER_STEP_MAX, CAPTURE_CYCLE_DURATION, CLEAR_CYCLE_DURATION, FIELD_COUNT, ALTERNATE_FIELD_ON_CLEAR, FOREGROUND_GRID_SIZE, FOREGROUND_GRID_RESOLUTION, IS_DEBUG, SHOW_WGSL_CODE } from './constants';
+import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERATION_PER_SEC, ITERATION_PER_STEP_MAX, CAPTURE_CYCLE_DURATION, CLEAR_CYCLE_DURATION, FIELD_COUNT, ALTERNATE_FIELD_ON_CLEAR, FOREGROUND_GRID_SIZE, FOREGROUND_GRID_RESOLUTION, IS_DEBUG, SHOW_WGSL_CODE, FOV_MAX, CAMERA_Z } from './constants';
 import { getElementSize, querySelectorOrThrow } from './dom_utils';
 import { SandSimulator } from './SandSimulator';
 import { WebcamCanvasTexture } from './WebcamCanvasTexture';
@@ -19,13 +19,24 @@ function showError(message:string){
 
 }
 
+function calcFovYFromFovMax(aspect:number,fovMax:number){
+  if(1 < aspect){
+const fovY=Math.atan(Math.tan(fovMax*0.5*THREE.MathUtils.DEG2RAD)/aspect)*THREE.MathUtils.RAD2DEG*2;
+    return fovY;
+  }else{
+    return fovMax;
+  }
+}
+
 
 async function mainAsync(){
   const backgroundElement=querySelectorOrThrow<HTMLElement>(".p-background");
 
   const {width,height}=getElementSize(backgroundElement);
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera( 30, width / height, 0.1, 1000 );
+  const aspect = width / height;
+  const fovY = calcFovYFromFovMax(aspect,FOV_MAX);
+  const camera = new THREE.PerspectiveCamera( fovY, aspect, 0.1, 1000 );
 
   {
     const ambientLight=new THREE.AmbientLight(0xffffff,0.6);
@@ -168,7 +179,7 @@ async function mainAsync(){
 
   }
 
-  camera.position.z = 2.5;
+  camera.position.z = CAMERA_Z;
 
   window.addEventListener("resize",()=>{
     onResize();
@@ -182,7 +193,10 @@ async function mainAsync(){
     const {width,height}=getElementSize(backgroundElement);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width,height);
-    camera.aspect=width/height;
+    const aspect = width/height;
+    camera.aspect=aspect;
+    const fovY = calcFovYFromFovMax(aspect,FOV_MAX);
+    camera.fov=fovY;
     camera.updateProjectionMatrix();
   }
 

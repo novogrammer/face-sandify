@@ -27,3 +27,8 @@ export const ALTERNATE_FIELD_ON_CLEAR=true;
 export const FOREGROUND_GRID_RESOLUTION=20;
 // 一辺の長さ
 export const FOREGROUND_GRID_SIZE=1;
+
+
+export const FOV_MAX = 30;
+
+export const CAMERA_Z = FOREGROUND_GRID_SIZE/(Math.tan(FOV_MAX*0.5*Math.PI/180)*2);
