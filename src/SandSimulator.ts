@@ -85,7 +85,7 @@ const isAirLikeCell=Fn(([cell]:[ReturnType<typeof Cell>])=>{
   ],
 });
 
-const makeNewFieldA=Fn(([uv,width]:[ReturnType<typeof vec2>,ReturnType<typeof int>])=>{
+const makeNewFieldClassic=Fn(([uv,width]:[ReturnType<typeof vec2>,ReturnType<typeof int>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
   const thickness=float(3).div(width).toVar("thickness");
   // フィールド0: 既存の斜めライン + 左右のシンク
@@ -124,7 +124,7 @@ const makeNewFieldA=Fn(([uv,width]:[ReturnType<typeof vec2>,ReturnType<typeof in
     },
   ],
 });
-const makeNewFieldB=Fn(([uv,width]:[ReturnType<typeof vec2>,ReturnType<typeof int>])=>{
+const makeNewFieldBucket=Fn(([uv,width]:[ReturnType<typeof vec2>,ReturnType<typeof int>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
   const thickness=float(3).div(width).toVar("thickness");
   // フィールド1: バケツ
@@ -159,9 +159,9 @@ const makeNewFieldB=Fn(([uv,width]:[ReturnType<typeof vec2>,ReturnType<typeof in
 const makeNewField=Fn(([uv,width,fieldIndex]:[ReturnType<typeof vec2>,ReturnType<typeof int>,ReturnType<typeof float>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
   If(fieldIndex.equal(int(0)),()=>{
-    kindNew.assign(makeNewFieldA(uv,width));
+    kindNew.assign(makeNewFieldClassic(uv,width));
   }).ElseIf(fieldIndex.equal(int(1)),()=>{
-    kindNew.assign(makeNewFieldB(uv,width));
+    kindNew.assign(makeNewFieldBucket(uv,width));
   }).Else(()=>{
     // DO NOTHING
   });
