@@ -228,11 +228,10 @@ export class SandSimulator{
         });
       });
 
-      const selfIndex=int(coord.y.mul(float(width)).add(coord.x)).toVar("selfIndex");
       // 結果を書き込み
-      kindOutput.element(selfIndex).assign(float(cellNext.get("kind")));
-      luminanceOutput.element(selfIndex).assign(cellNext.get("luminance"));
-      ttlOutput.element(selfIndex).assign(cellNext.get("ttl"));
+      kindOutput.element(instanceIndex).assign(float(cellNext.get("kind")));
+      luminanceOutput.element(instanceIndex).assign(cellNext.get("luminance"));
+      ttlOutput.element(instanceIndex).assign(cellNext.get("ttl"));
     });  
 
     this.computeNodePing=computeShader(
