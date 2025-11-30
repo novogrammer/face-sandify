@@ -1,4 +1,4 @@
-import { bool, float, Fn, If, instanceIndex, int, select, texture, uniform, vec2, mix, clamp, hash, not, fract, instancedArray, floor, uv } from 'three/tsl';
+import { bool, float, Fn, If, instanceIndex, int, select, texture, uniform, vec2, mix, clamp, hash, not, fract, instancedArray, floor, uv, convertToTexture } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 import { DIR_SWAP_PERIOD, IGNORE_SAND_TTL, SAND_SPACING, SAND_TTL_MAX, SAND_TTL_MIN, SHOW_WGSL_CODE } from '../constants';
 import { Cell, isAirLikeCell, KIND_AIR, KIND_SAND, KIND_SINK, KIND_WALL, toColor } from './sand_types';
@@ -288,19 +288,18 @@ export class SandSimulator{
         FloatStorageNode,
         FloatStorageNode,
       ])=>{
-        const remappedUvNode = uvNode.sub(vec2(0.5)).mul(uScale).add(vec2(0.5)).toVar().fract();
-        const cell=sampleCell(remappedUvNode,kindStorage,luminanceStorage,ttlStorage).toVar();
+        // const remappedUvNode = uvNode.sub(vec2(0.5)).mul(uScale).add(vec2(0.5)).toVar().fract();
+        const cell=sampleCell(uvNode,kindStorage,luminanceStorage,ttlStorage).toVar();
         return toColor(cell);
       });
+      const toScaledUv=(uv:THREE.Node)=>uv.sub(vec2(0.5)).mul(uScale).add(vec2(0.5)).fract();
       {
         const colorNodePing=colorFn(uv(),this.storageKindPong,this.storageLuminancePong,this.storageTtlPong);
         const colorNodePong=colorFn(uv(),this.storageKindPing,this.storageLuminancePing,this.storageTtlPing);
-        this._colorNode=select(this.uIsPing.notEqual(0),colorNodePing,colorNodePong);
-      }
-      {
-        const colorNodePing=colorFn(gridUvNode,this.storageKindPong,this.storageLuminancePong,this.storageTtlPong);
-        const colorNodePong=colorFn(gridUvNode,this.storageKindPing,this.storageLuminancePing,this.storageTtlPing);
-        this._colorNodeForGrid=select(this.uIsPing.notEqual(0),colorNodePing,colorNodePong);
+        const color=select(this.uIsPing.notEqual(0),colorNodePing,colorNodePong);
+        const t=convertToTexture(color,width,height);
+        this._colorNode=texture(t,toScaledUv(uv()));
+        this._colorNodeForGrid=texture(t,toScaledUv(gridUvNode));
       }
 
     }
