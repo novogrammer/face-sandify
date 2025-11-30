@@ -1,6 +1,6 @@
-import { bool, float, Fn, frameId, If, instanceIndex, int, select, texture, uniform, vec2, mix, clamp, hash, not, fract, instancedArray, floor, uv } from 'three/tsl';
+import { bool, float, Fn, If, instanceIndex, int, select, texture, uniform, vec2, mix, clamp, hash, not, fract, instancedArray, floor, uv } from 'three/tsl';
 import * as THREE from 'three/webgpu';
-import { IGNORE_SAND_TTL, SAND_SPACING, SAND_TTL_MAX, SAND_TTL_MIN, SHOW_WGSL_CODE } from '../constants';
+import { DIR_SWAP_PERIOD, IGNORE_SAND_TTL, SAND_SPACING, SAND_TTL_MAX, SAND_TTL_MIN, SHOW_WGSL_CODE } from '../constants';
 import { Cell, isAirLikeCell, KIND_AIR, KIND_SAND, KIND_SINK, KIND_WALL, toColor } from './sand_types';
 import { makeNewField } from './makeNewField';
 
@@ -34,6 +34,7 @@ export class SandSimulator{
 
   private readonly uIsClearing:THREE.UniformNode<number>;
   private readonly uFieldIndex:THREE.UniformNode<number>;
+  private readonly uFrameId:THREE.UniformNode<number>;
 
   private readonly computeNodePing:THREE.ComputeNode;
   private readonly computeNodePong:THREE.ComputeNode;
@@ -71,6 +72,7 @@ export class SandSimulator{
     this._uDeltaTime=uniform(0).setName("uDeltaTime");
     this.uIsClearing=uniform(0).setName("uIsClearing");
     this.uFieldIndex=uniform(0).setName("uFieldIndex");
+    this.uFrameId=uniform(0,"int").setName("uFrameId");
 
     // コンピュートシェーダーの定義
     const computeShader = Fn(([
@@ -95,7 +97,7 @@ export class SandSimulator{
 
       uvWebcam.assign(fract(uvWebcam.sub(CAPTURE_POINT).mul(CAPTURE_UV_SCALE).add(CAPTURE_POINT)));
 
-      const useLeftPriority = frameId.mod(2).equal(int(0)).toVar("useLeftPriority");
+      const useLeftPriority = int(this.uFrameId).div(DIR_SWAP_PERIOD).mod(2).equal(int(0)).toVar("useLeftPriority");
       const useLeftFactor = vec2(select(useLeftPriority , 1.0 , -1.0), 1.0).toVar("useLeftFactor");
 
       const pickCell=Fn(([coord,offsetOriginal,useLeftFactor]:[ReturnType<typeof vec2>,ReturnType<typeof vec2>,ReturnType<typeof vec2>])=>{
@@ -317,6 +319,7 @@ export class SandSimulator{
     this.uIsCapturing.value=isCapturing?1:0;
     this.uIsClearing.value=isClearing?1:0;
     this.uFieldIndex.value=fieldIndex|0;
+    this.uFrameId.value=this.uFrameId.value + 1;
 
     let computeNode;
     if(this.isPing){

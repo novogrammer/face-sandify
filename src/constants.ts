@@ -14,6 +14,7 @@ export const SAND_TTL_MIN=100;
 export const SAND_TTL_MAX=200;
 export const IGNORE_SAND_TTL=true;
 export const SAND_SPACING=2;
+export const DIR_SWAP_PERIOD=8;
 
 // 砂を一定間隔で全消去する周期（秒）
 export const CLEAR_CYCLE_DURATION=15;
