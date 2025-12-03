@@ -1,4 +1,4 @@
-import { bool, float, Fn, If, instanceIndex, int, select, texture, uniform, vec2, mix, clamp, hash, not, fract, instancedArray, floor, uv, convertToTexture } from 'three/tsl';
+import { bool, float, Fn, If, instanceIndex, int, select, texture, uniform, vec2, mix, clamp, hash, not, instancedArray, floor, uv, convertToTexture } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 import { DIR_SWAP_PERIOD, IGNORE_SAND_TTL, SAND_SPACING, SAND_TTL_MAX, SAND_TTL_MIN, SHOW_WGSL_CODE } from '../constants';
 import { Cell, isAirLikeCell, KIND_AIR, KIND_SAND, KIND_SINK, KIND_WALL, toColor } from './sand_types';
@@ -93,9 +93,7 @@ export class SandSimulator{
       const coord = vec2(instanceIndex.mod(width), instanceIndex.div(width)).toVar("coord");
       // UV座標を手動で計算
       const uv = vec2(coord).div(vec2(width, height)).toVar("uv");
-      const uvWebcam=uv.sub(0.5).mul(this.uWebcamTextureSize.yy).div(this.uWebcamTextureSize.xy).add(0.5).toVar("uvWebcam");
-
-      uvWebcam.assign(fract(uvWebcam.sub(CAPTURE_POINT).mul(CAPTURE_UV_SCALE).add(CAPTURE_POINT)));
+      const uvWebcam=uv.sub(CAPTURE_POINT).mul(this.uWebcamTextureSize.yy).div(this.uWebcamTextureSize.xy).mul(CAPTURE_UV_SCALE).add(vec2(0.5)).fract().toVar("uvWebcam");
 
       const useLeftPriority = int(this.uFrameId).div(DIR_SWAP_PERIOD).mod(2).equal(int(0)).toVar("useLeftPriority");
       const useLeftFactor = vec2(select(useLeftPriority , 1.0 , -1.0), 1.0).toVar("useLeftFactor");
