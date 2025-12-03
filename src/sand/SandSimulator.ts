@@ -198,7 +198,7 @@ export class SandSimulator{
       
 
       If(bool(this.uIsClearing),()=>{
-        const kindNew=makeNewField(uv,float(width),int(this.uFieldIndex)).toVar("kindNew");
+        const kindNew=makeNewField(uv,int(this.uFieldIndex)).toVar("kindNew");
         If(kindNew.equal(KIND_WALL),()=>{
           cellNext.assign(Cell(
             KIND_WALL,

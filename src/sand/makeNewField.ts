@@ -26,9 +26,9 @@ const distPointSegment=Fn(([p,a,b]:[ReturnType<typeof vec2>,ReturnType<typeof ve
   ],
 });
 
-const makeNewFieldClassic=Fn(([uv,width]:[ReturnType<typeof vec2>,ReturnType<typeof int>])=>{
+const makeNewFieldClassic=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
-  const thickness=float(3).div(width).toVar("thickness");
+  const thickness=float(0.6*0.01).toVar("thickness");
   // フィールド0: 既存の斜めライン + 左右のシンク
   {
     If(min(
@@ -59,15 +59,11 @@ const makeNewFieldClassic=Fn(([uv,width]:[ReturnType<typeof vec2>,ReturnType<typ
       name:"uv",
       type:"vec2",
     },
-    {
-      name:"width",
-      type:"float",
-    },
   ],
 });
-const makeNewFieldBucket=Fn(([uv,width]:[ReturnType<typeof vec2>,ReturnType<typeof int>])=>{
+const makeNewFieldBucket=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
-  const thickness=float(3).div(width).toVar("thickness");
+  const thickness=float(0.6*0.01).toVar("thickness");
   // フィールド1: バケツ
   {
     If(min(
@@ -90,19 +86,15 @@ const makeNewFieldBucket=Fn(([uv,width]:[ReturnType<typeof vec2>,ReturnType<type
       name:"uv",
       type:"vec2",
     },
-    {
-      name:"width",
-      type:"float",
-    },
   ],
 });
 
-export const makeNewField=Fn(([uv,width,fieldIndex]:[ReturnType<typeof vec2>,ReturnType<typeof int>,ReturnType<typeof float>])=>{
+export const makeNewField=Fn(([uv,fieldIndex]:[ReturnType<typeof vec2>,ReturnType<typeof float>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
   If(fieldIndex.equal(int(0)),()=>{
-    kindNew.assign(makeNewFieldClassic(uv,width));
+    kindNew.assign(makeNewFieldClassic(uv));
   }).ElseIf(fieldIndex.equal(int(1)),()=>{
-    kindNew.assign(makeNewFieldBucket(uv,width));
+    kindNew.assign(makeNewFieldBucket(uv));
   }).Else(()=>{
     // DO NOTHING
   });
@@ -115,10 +107,6 @@ export const makeNewField=Fn(([uv,width,fieldIndex]:[ReturnType<typeof vec2>,Ret
     {
       name:"uv",
       type:"vec2",
-    },
-    {
-      name:"width",
-      type:"float",
     },
     {
       name:"fieldIndex",
