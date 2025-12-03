@@ -5,7 +5,7 @@ import { Cell, isAirLikeCell, KIND_AIR, KIND_SAND, KIND_SINK, KIND_WALL, toColor
 import { makeNewField } from './makeNewField';
 
 
-const CAPTURE_POINT=vec2(0.5,0.65);
+const CAPTURE_POINT=vec2(0.5,0.75);
 const CAPTURE_RADIUS=float(0.25);
 const CAPTURE_UV_SCALE=float(2.0);
 

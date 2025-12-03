@@ -1,4 +1,4 @@
-import { clamp, dot, Fn, int, vec2, length, If, min, float } from "three/tsl";
+import { clamp, dot, Fn, int, vec2, length, If, min, float, Loop } from "three/tsl";
 import { KIND_AIR, KIND_SINK, KIND_WALL } from "./sand_types";
 
 const distPointSegment=Fn(([p,a,b]:[ReturnType<typeof vec2>,ReturnType<typeof vec2>,ReturnType<typeof vec2>])=>{
@@ -28,8 +28,8 @@ const distPointSegment=Fn(([p,a,b]:[ReturnType<typeof vec2>,ReturnType<typeof ve
 
 const makeNewFieldClassic=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
-  const thickness=float(0.6*0.01).toVar("thickness");
-  // フィールド0: 既存の斜めライン + 左右のシンク
+  const thickness=float(0.5*0.01).toVar("thickness");
+  // 既存の斜めライン + 左右のシンク
   {
     If(min(
       distPointSegment(uv,vec2(0.3,0.90),vec2(0.5,0.95)),
@@ -52,7 +52,7 @@ const makeNewFieldClassic=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   }
   return kindNew;
 }).setLayout({
-  name:"makeNewFieldA",
+  name:"makeNewFieldClassic",
   type:"int",
   inputs:[
     {
@@ -63,8 +63,8 @@ const makeNewFieldClassic=Fn(([uv]:[ReturnType<typeof vec2>])=>{
 });
 const makeNewFieldBucket=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
-  const thickness=float(0.6*0.01).toVar("thickness");
-  // フィールド1: バケツ
+  const thickness=float(0.5*0.01).toVar("thickness");
+  // バケツ
   {
     If(min(
       // 下辺
@@ -79,7 +79,41 @@ const makeNewFieldBucket=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   }
   return kindNew;
 }).setLayout({
-  name:"makeNewFieldB",
+  name:"makeNewFieldBucket",
+  type:"int",
+  inputs:[
+    {
+      name:"uv",
+      type:"vec2",
+    },
+  ],
+});
+
+const makeNewFieldHourglass=Fn(([uv]:[ReturnType<typeof vec2>])=>{
+  const kindNew=KIND_AIR.toVar("kindNew");
+  const thickness=float(0.5*0.01).toVar("thickness");
+  // 砂時計
+  Loop(2,({i})=>{
+    const mirroredUv = uv.toVar("uv2");
+    If(i.notEqual(int(0)),()=>{
+      mirroredUv.assign(vec2(uv.x.oneMinus(),uv.y));
+    });
+    If(min(
+      distPointSegment(mirroredUv,vec2(0.2,1.0),vec2(0.2,0.6)),
+      distPointSegment(mirroredUv,vec2(0.2,0.6),vec2(0.49,0.4)),
+      distPointSegment(mirroredUv,vec2(0.49,0.4),vec2(0.49,0.35)),
+      distPointSegment(mirroredUv,vec2(0.49,0.35),vec2(0.2,0.15)),
+      distPointSegment(mirroredUv,vec2(0.2,0.15),vec2(0.2,0.0)),
+      distPointSegment(mirroredUv,vec2(0.3,0.01),vec2(0.5,0.01)),
+      
+    ).lessThanEqual(thickness),()=>{
+      kindNew.assign(KIND_WALL);
+    });
+
+  });
+  return kindNew;
+}).setLayout({
+  name:"makeNewFieldHourglass",
   type:"int",
   inputs:[
     {
@@ -94,6 +128,8 @@ export const makeNewField=Fn(([uv,fieldIndex]:[ReturnType<typeof vec2>,ReturnTyp
   If(fieldIndex.equal(int(0)),()=>{
     kindNew.assign(makeNewFieldClassic(uv));
   }).ElseIf(fieldIndex.equal(int(1)),()=>{
+    kindNew.assign(makeNewFieldHourglass(uv));
+  }).ElseIf(fieldIndex.equal(int(2)),()=>{
     kindNew.assign(makeNewFieldBucket(uv));
   }).Else(()=>{
     // DO NOTHING
