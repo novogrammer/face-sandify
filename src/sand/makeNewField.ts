@@ -68,11 +68,11 @@ const makeNewFieldBucket=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   {
     If(min(
       // 下辺
-      distPointSegment(uv,vec2(0.1,0.05),vec2(0.9,0.05)),
+      distPointSegment(uv,vec2(0.2,0.005),vec2(0.8,0.005)),
       // 左辺
-      distPointSegment(uv,vec2(0.1,0.05),vec2(0.0,0.9)),
+      distPointSegment(uv,vec2(0.2,0.005),vec2(0.1,0.6)),
       // 右辺
-      distPointSegment(uv,vec2(0.9,0.05),vec2(1.0,0.9)),
+      distPointSegment(uv,vec2(0.8,0.005),vec2(0.9,0.6)),
     ).lessThanEqual(thickness),()=>{
       kindNew.assign(KIND_WALL);
     });
@@ -104,7 +104,7 @@ const makeNewFieldHourglass=Fn(([uv]:[ReturnType<typeof vec2>])=>{
       distPointSegment(mirroredUv,vec2(0.49,0.4),vec2(0.49,0.35)),
       distPointSegment(mirroredUv,vec2(0.49,0.35),vec2(0.2,0.15)),
       distPointSegment(mirroredUv,vec2(0.2,0.15),vec2(0.2,0.0)),
-      distPointSegment(mirroredUv,vec2(0.3,0.01),vec2(0.5,0.01)),
+      distPointSegment(mirroredUv,vec2(0.2,0.005),vec2(0.5,0.005)),
       
     ).lessThanEqual(thickness),()=>{
       kindNew.assign(KIND_WALL);
