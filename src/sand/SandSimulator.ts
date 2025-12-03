@@ -6,7 +6,7 @@ import { makeNewField } from './makeNewField';
 
 
 const CAPTURE_POINT=vec2(0.5,0.75);
-const CAPTURE_RADIUS=float(0.25);
+const CAPTURE_RADIUS=float(0.2);
 const CAPTURE_UV_SCALE=float(2.0);
 
 
