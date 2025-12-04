@@ -146,15 +146,40 @@ const makeNewFieldSieve=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   ],
 });
 
+const makeNewFieldSlope=Fn(([uv]:[ReturnType<typeof vec2>])=>{
+  const kindNew=KIND_AIR.toVar("kindNew");
+  const thickness=float(0.5*0.01).toVar("thickness");
+  // 坂
+  Loop(2,({i})=>{
+    const offset = vec2(1,0).mul(float(i));
+    If(distPointSegment(uv,vec2(-0.2,0.005).add(offset),vec2(0.9,0.405).add(offset)).lessThanEqual(thickness),()=>{
+      kindNew.assign(KIND_WALL);
+    });
+
+  });
+  return kindNew;
+}).setLayout({
+  name:"makeNewFieldSlope",
+  type:"int",
+  inputs:[
+    {
+      name:"uv",
+      type:"vec2",
+    },
+  ],
+});
+
 export const makeNewField=Fn(([uv,fieldIndex]:[ReturnType<typeof vec2>,ReturnType<typeof float>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
   If(fieldIndex.equal(int(0)),()=>{
     kindNew.assign(makeNewFieldClassic(uv));
   }).ElseIf(fieldIndex.equal(int(1)),()=>{
-    kindNew.assign(makeNewFieldSieve(uv));
+    kindNew.assign(makeNewFieldSlope(uv));
   }).ElseIf(fieldIndex.equal(int(2)),()=>{
-    kindNew.assign(makeNewFieldHourglass(uv));
+    kindNew.assign(makeNewFieldSieve(uv));
   }).ElseIf(fieldIndex.equal(int(3)),()=>{
+    kindNew.assign(makeNewFieldHourglass(uv));
+  }).ElseIf(fieldIndex.equal(int(4)),()=>{
     kindNew.assign(makeNewFieldBucket(uv));
   }).Else(()=>{
     // DO NOTHING
