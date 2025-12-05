@@ -25,7 +25,7 @@ export const ALTERNATE_FIELD_ON_CLEAR=true;
 
 
 // 一辺の個数
-export const FOREGROUND_GRID_RESOLUTION=128;
+export const FOREGROUND_GRID_RESOLUTION=32;
 // 一辺の長さ
 export const FOREGROUND_GRID_SIZE=1;
 
