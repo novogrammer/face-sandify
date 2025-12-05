@@ -40,7 +40,8 @@ export class GridUpdater{
     this.gridResolution=gridResolution;
     this.grid.count = this.gridResolution * this.gridResolution;
 
-    const orientation = axisAngleToMat3(vec3(0,1,0),float(this.uTime).mul(180*THREE.MathUtils.DEG2RAD)).toVar();
+    // 回転させないほうがいいかも
+    const orientation = axisAngleToMat3(vec3(0,1,0),float(this.uTime).mul(0*THREE.MathUtils.DEG2RAD)).toVar();
     this.grid.material.positionNode = Fn(()=>{
       const ix = float(instanceIndex.mod(this.gridResolution)).toVar();
       const iy = float(instanceIndex.div(this.gridResolution)).toVar();
