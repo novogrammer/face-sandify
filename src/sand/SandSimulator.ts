@@ -1,6 +1,6 @@
 import { bool, float, Fn, If, instanceIndex, int, select, texture, uniform, vec2, mix, clamp, hash, not, instancedArray, floor, uv, convertToTexture, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
-import { DIR_SWAP_PERIOD, IGNORE_SAND_TTL, SAND_SPACING, SAND_TTL_MAX, SAND_TTL_MIN, SHOW_COMPUTE_WGSL_CODE,SHOW_RENDER_WGSL_CODE } from '../constants';
+import { DIR_SWAP_PERIOD, IGNORE_SAND_TTL, SAND_SPACING, SAND_TTL_MAX, SAND_TTL_MIN, SHOW_COMPUTE_WGSL_CODE, SHOW_RENDER_WGSL_CODE } from '../constants';
 import { Cell, isAirLikeCell, KIND_AIR, KIND_SAND, KIND_SINK, KIND_WALL, toColor } from './sand_types';
 import { makeNewField } from './makeNewField';
 
@@ -251,59 +251,54 @@ export class SandSimulator{
       this.storageTtlPing,
     ).compute(this.width*this.height);
 
-    const sampleCell = Fn(([
-      uvCoord,
-      kindStorage,
-      luminanceStorage,
-      ttlStorage,
-    ]:[
-      ReturnType<typeof vec2>,
-      FloatStorageNode,
-      FloatStorageNode,
-      FloatStorageNode,
-    ]) => {
-      const uvClamped=clamp(uvCoord,vec2(0.0),vec2(0.999999)).toVar();
-      const scaled=floor(uvClamped.mul(vec2(float(width),float(height)))).toVar();
-      const ix=int(clamp(scaled.x,0.0,float(width-1))).toVar();
-      const iy=int(clamp(scaled.y,0.0,float(height-1))).toVar();
-      const index=iy.mul(int(width)).add(ix).toVar();
-      return Cell(
-        int(kindStorage.element(index)),
-        luminanceStorage.element(index),
-        ttlStorage.element(index),
-      );
-    });
+    const uvToIndex = Fn(([uvCoord]:[ReturnType<typeof vec2>])=>{
+      const uvClamped=clamp(uvCoord,vec2(0.0),vec2(0.999999)).toVar("uvClamped");
+      const scaled=floor(uvClamped.mul(vec2(float(width),float(height)))).toVar("scaled");
+      const ix=int(clamp(scaled.x,0.0,float(width-1))).toVar("ix");
+      const iy=int(clamp(scaled.y,0.0,float(height-1))).toVar("iy");
+      const index=iy.mul(int(width)).add(ix).toVar("index");
+      return index;
+    }).setLayout({
+      name:"uvToIndex",
+      type:"int",
+      inputs:[
+        {
+          name:"uvCoord",
+          type:"vec2",
+        },
+      ],
+    })
+
 
     {
-      const colorFn = Fn(([
-        uvNode,
-        kindStorage,
-        luminanceStorage,
-        ttlStorage,
-      ]:[
-        THREE.Node,
-        FloatStorageNode,
-        FloatStorageNode,
-        FloatStorageNode,
-      ])=>{
-        // const remappedUvNode = uvNode.sub(vec2(0.5)).mul(uScale).add(vec2(0.5)).toVar().fract();
-        const cell=sampleCell(uvNode,kindStorage,luminanceStorage,ttlStorage).toVar();
-        return toColor(cell);
-      });
       const toScaledUv=(uv:THREE.Node)=>uv.sub(vec2(0.5)).mul(uScale).add(vec2(0.5)).fract();
       {
         const color=Fn(()=>{
-          const colorNode = vec4().toVar();
+          const colorNode = vec4().toVar("colorNode");
+          const index=uvToIndex(uv()).toVar("index");
           If(this.uIsPing.notEqual(0),()=>{
-            const colorNodePing=colorFn(uv(),this.storageKindPong,this.storageLuminancePong,this.storageTtlPong);
-            colorNode.assign(colorNodePing);
+            const cellPong = Cell(
+              int(this.storageKindPong.element(index)),
+              this.storageLuminancePong.element(index),
+              this.storageTtlPong.element(index),
+            ).toVar("cellPong");
+            colorNode.assign(toColor(cellPong));
           }).Else(()=>{
-            const colorNodePong=colorFn(uv(),this.storageKindPing,this.storageLuminancePing,this.storageTtlPing);
-            colorNode.assign(colorNodePong);
+            const cellPing = Cell(
+              int(this.storageKindPing.element(index)),
+              this.storageLuminancePing.element(index),
+              this.storageTtlPing.element(index),
+            ).toVar("cellPing");
+            colorNode.assign(toColor(cellPing));
           })
           if(SHOW_RENDER_WGSL_CODE){
-            colorNode.debug();
-            debugger;
+            colorNode.debug((builder) => {  
+              const {renderer,camera,scene,object} = builder as any;
+              renderer.debug.getShaderAsync( scene, camera, object ).then((rawShader:any)=>{
+                console.log(rawShader.fragmentShader);
+                debugger;
+              });
+            });
           }
           return colorNode;
 
