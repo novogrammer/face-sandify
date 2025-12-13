@@ -1,4 +1,4 @@
-import { bool, float, Fn, If, instanceIndex, int, select, texture, uniform, vec2, mix, clamp, hash, not, instancedArray, floor, uv, convertToTexture } from 'three/tsl';
+import { bool, float, Fn, If, instanceIndex, int, select, texture, uniform, vec2, mix, clamp, hash, not, instancedArray, floor, uv, convertToTexture, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
 import { DIR_SWAP_PERIOD, IGNORE_SAND_TTL, SAND_SPACING, SAND_TTL_MAX, SAND_TTL_MIN, SHOW_WGSL_CODE } from '../constants';
 import { Cell, isAirLikeCell, KIND_AIR, KIND_SAND, KIND_SINK, KIND_WALL, toColor } from './sand_types';
@@ -292,9 +292,18 @@ export class SandSimulator{
       });
       const toScaledUv=(uv:THREE.Node)=>uv.sub(vec2(0.5)).mul(uScale).add(vec2(0.5)).fract();
       {
-        const colorNodePing=colorFn(uv(),this.storageKindPong,this.storageLuminancePong,this.storageTtlPong);
-        const colorNodePong=colorFn(uv(),this.storageKindPing,this.storageLuminancePing,this.storageTtlPing);
-        const color=select(this.uIsPing.notEqual(0),colorNodePing,colorNodePong);
+        const color=Fn(()=>{
+          const colorNode = vec4().toVar();
+          If(this.uIsPing.notEqual(0),()=>{
+            const colorNodePing=colorFn(uv(),this.storageKindPong,this.storageLuminancePong,this.storageTtlPong);
+            colorNode.assign(colorNodePing);
+          }).Else(()=>{
+            const colorNodePong=colorFn(uv(),this.storageKindPing,this.storageLuminancePing,this.storageTtlPing);
+            colorNode.assign(colorNodePong);
+          })
+          return colorNode;
+
+        })();
         const t=convertToTexture(color,width,height);
         this._colorNode=texture(t,toScaledUv(uv()));
         this._colorNodeForGrid=texture(t,toScaledUv(gridUvNode));
