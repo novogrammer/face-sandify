@@ -1,6 +1,6 @@
 import { bool, float, Fn, If, instanceIndex, int, select, texture, uniform, vec2, mix, clamp, hash, not, instancedArray, floor, uv, convertToTexture, vec4 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
-import { DIR_SWAP_PERIOD, IGNORE_SAND_TTL, SAND_SPACING, SAND_TTL_MAX, SAND_TTL_MIN, SHOW_WGSL_CODE } from '../constants';
+import { DIR_SWAP_PERIOD, IGNORE_SAND_TTL, SAND_SPACING, SAND_TTL_MAX, SAND_TTL_MIN, SHOW_COMPUTE_WGSL_CODE,SHOW_RENDER_WGSL_CODE } from '../constants';
 import { Cell, isAirLikeCell, KIND_AIR, KIND_SAND, KIND_SINK, KIND_WALL, toColor } from './sand_types';
 import { makeNewField } from './makeNewField';
 
@@ -301,6 +301,10 @@ export class SandSimulator{
             const colorNodePong=colorFn(uv(),this.storageKindPing,this.storageLuminancePing,this.storageTtlPing);
             colorNode.assign(colorNodePong);
           })
+          if(SHOW_RENDER_WGSL_CODE){
+            colorNode.debug();
+            debugger;
+          }
           return colorNode;
 
         })();
@@ -334,7 +338,7 @@ export class SandSimulator{
       computeNode=this.computeNodePong;
     }
 
-    if(SHOW_WGSL_CODE){
+    if(SHOW_COMPUTE_WGSL_CODE){
       console.log((renderer as any)._nodes.getForCompute(computeNode).computeShader);
       debugger;
     }
