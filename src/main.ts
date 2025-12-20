@@ -101,12 +101,15 @@ async function mainAsync(){
     return;
   }
 
+  const matcap=new THREE.TextureLoader().load('assets/textures/matcaps/matcap-porcelain-white.jpg');
   let foregroundUpdater:GridUpdater;
-  let foregroundPrimary:THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicNodeMaterial, THREE.Object3DEventMap>;
+  let foregroundPrimary:THREE.Mesh<THREE.BoxGeometry, THREE.MeshMatcapNodeMaterial, THREE.Object3DEventMap>;
   {
     const cellSize = FOREGROUND_GRID_SIZE / FOREGROUND_GRID_RESOLUTION;
     const geometry = new THREE.BoxGeometry( cellSize, cellSize, cellSize );
-    const material = new THREE.MeshBasicNodeMaterial();
+    const material = new THREE.MeshMatcapNodeMaterial({
+      matcap,
+    });
     foregroundPrimary = new THREE.Mesh( geometry, material );
     foregroundPrimary.position.z = cellSize * -0.5;
     foregroundUpdater=new GridUpdater(foregroundPrimary,FOREGROUND_GRID_SIZE,FOREGROUND_GRID_RESOLUTION);
@@ -118,10 +121,11 @@ async function mainAsync(){
   foregroundSecondary.material=foregroundPrimary.material.clone();
   scene.add(foregroundSecondary);
 
-  let backgroundPrimary:THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicNodeMaterial, THREE.Object3DEventMap>;
+  let backgroundPrimary:THREE.Mesh<THREE.PlaneGeometry, THREE.MeshMatcapNodeMaterial, THREE.Object3DEventMap>;
   {
     const geometry = new THREE.PlaneGeometry( FOREGROUND_GRID_SIZE, FOREGROUND_GRID_SIZE);
-    const material = new THREE.MeshBasicNodeMaterial({
+    const material = new THREE.MeshMatcapNodeMaterial({
+      matcap,
       depthWrite:false,
     });
     backgroundPrimary = new THREE.Mesh( geometry, material );

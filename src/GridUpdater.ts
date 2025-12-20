@@ -31,10 +31,10 @@ const axisAngleToMat3 = Fn(( [axisInput, angleInput]: [THREE.Node, THREE.Node] )
 
 export class GridUpdater{
   private readonly uTime:THREE.UniformNode<number> = uniform(0);
-  private readonly grid:THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicNodeMaterial, THREE.Object3DEventMap>;
+  private readonly grid:THREE.Mesh<THREE.BoxGeometry, THREE.MeshMatcapNodeMaterial, THREE.Object3DEventMap>;
   private readonly gridSize:number;
   private readonly gridResolution:number;
-  constructor(grid:THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicNodeMaterial, THREE.Object3DEventMap>,gridSize:number,gridResolution:number){
+  constructor(grid:THREE.Mesh<THREE.BoxGeometry, THREE.MeshMatcapNodeMaterial, THREE.Object3DEventMap>,gridSize:number,gridResolution:number){
     this.grid = grid;
     this.gridSize=gridSize;
     this.gridResolution=gridResolution;
