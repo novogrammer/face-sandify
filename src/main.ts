@@ -38,15 +38,15 @@ async function mainAsync(){
   const fovY = calcFovYFromFovMax(aspect,FOV_MAX);
   const camera = new THREE.PerspectiveCamera( fovY, aspect, 0.1, 1000 );
 
-  {
-    const ambientLight=new THREE.AmbientLight(0xffffff,0.6);
-    scene.add(ambientLight);
-  }
-  {
-    const directionalLight=new THREE.DirectionalLight(0xffffff,2);
-    directionalLight.position.set(10,10,10);
-    scene.add(directionalLight);
-  }
+  // {
+  //   const ambientLight=new THREE.AmbientLight(0xffffff,0.6);
+  //   scene.add(ambientLight);
+  // }
+  // {
+  //   const directionalLight=new THREE.DirectionalLight(0xffffff,2);
+  //   directionalLight.position.set(10,10,10);
+  //   scene.add(directionalLight);
+  // }
 
 
   let renderer:THREE.WebGPURenderer;
@@ -102,11 +102,11 @@ async function mainAsync(){
   }
 
   let foregroundUpdater:GridUpdater;
-  let foregroundPrimary:THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
+  let foregroundPrimary:THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicNodeMaterial, THREE.Object3DEventMap>;
   {
     const cellSize = FOREGROUND_GRID_SIZE / FOREGROUND_GRID_RESOLUTION;
     const geometry = new THREE.BoxGeometry( cellSize, cellSize, cellSize );
-    const material = new THREE.MeshStandardNodeMaterial();
+    const material = new THREE.MeshBasicNodeMaterial();
     foregroundPrimary = new THREE.Mesh( geometry, material );
     foregroundPrimary.position.z = cellSize * -0.5;
     foregroundUpdater=new GridUpdater(foregroundPrimary,FOREGROUND_GRID_SIZE,FOREGROUND_GRID_RESOLUTION);
@@ -118,10 +118,10 @@ async function mainAsync(){
   foregroundSecondary.material=foregroundPrimary.material.clone();
   scene.add(foregroundSecondary);
 
-  let backgroundPrimary:THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardNodeMaterial, THREE.Object3DEventMap>;
+  let backgroundPrimary:THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicNodeMaterial, THREE.Object3DEventMap>;
   {
     const geometry = new THREE.PlaneGeometry( FOREGROUND_GRID_SIZE, FOREGROUND_GRID_SIZE);
-    const material = new THREE.MeshStandardNodeMaterial({
+    const material = new THREE.MeshBasicNodeMaterial({
       depthWrite:false,
     });
     backgroundPrimary = new THREE.Mesh( geometry, material );
