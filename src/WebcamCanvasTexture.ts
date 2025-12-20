@@ -5,6 +5,29 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function getWebcamErrorHint(error?: unknown): string | undefined {
+  // Insecure origins cannot use getUserMedia except for localhost.
+  if (typeof isSecureContext !== 'undefined' && !isSecureContext) {
+    return 'Webカメラを使用するには HTTPS で開くか、例外扱いの http://localhost を利用してください。';
+  }
+
+  const domError = error as Partial<DOMException> | undefined;
+  switch (domError?.name) {
+  case 'NotAllowedError':
+  case 'PermissionDeniedError':
+    return 'ブラウザのカメラ権限がブロックされています。許可してください。';
+  case 'NotFoundError':
+  case 'DevicesNotFoundError':
+    return 'カメラデバイスが見つかりません。接続を確認してください。';
+  case 'NotReadableError':
+    return 'カメラが他のアプリで使用中の可能性があります。';
+  case 'SecurityError':
+    return 'セキュリティ設定によりカメラにアクセスできません。';
+  default:
+    return undefined;
+  }
+}
+
 export class WebcamCanvasTexture {
   private readonly videoElement: HTMLVideoElement;
   private readonly canvasElement: HTMLCanvasElement;
@@ -32,6 +55,10 @@ export class WebcamCanvasTexture {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       throw new Error('MediaDevices interface not available.');
     }
+    const secureContextHint = getWebcamErrorHint();
+    if (secureContextHint) {
+      throw new Error(secureContextHint);
+    }
 
     const constraints: MediaStreamConstraints = {
       video: {
@@ -45,7 +72,12 @@ export class WebcamCanvasTexture {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       videoElement.srcObject = stream;
     } catch (error) {
-      throw new Error(`Unable to access the camera/webcam. ${getErrorMessage(error)}`);
+      const hint = getWebcamErrorHint(error);
+      const detail = getErrorMessage(error);
+      if (hint) {
+        throw new Error(`Webカメラにアクセスできません。\n${hint}\n${detail}`);
+      }
+      throw new Error(`Webカメラにアクセスできません。${detail}`);
     }
 
     await new Promise<void>((resolve) => {
