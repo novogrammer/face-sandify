@@ -11,8 +11,8 @@ export const ITERATION_PER_SEC=60*4;
 
 export const DELTA_TIME_MAX=1/30;
 export const CAPTURE_CYCLE_DURATION=5;
-export const SAND_TTL_MIN=100;
-export const SAND_TTL_MAX=200;
+export const SAND_TTL_MIN=10;
+export const SAND_TTL_MAX=20;
 export const IGNORE_SAND_TTL=true;
 export const SAND_SPACING=2;
 export const DIR_SWAP_PERIOD=8;
