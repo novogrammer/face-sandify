@@ -202,24 +202,27 @@ async function mainAsync(){
   //   console.error(error);
   // })
 
-  let previousTime=-0.001;
+  let previousRawTime = performance.now() * 0.001;
+  let simTime = 0;
+  let previousSimTime = - 0.001;
   let gridStartTime=0;
   let currentFieldIndex=0;
 
   renderer.setAnimationLoop( animate );
   function animate(){
-    const time=performance.now()*0.001;
+    const rawTime=performance.now()*0.001;
 
-    const deltaTime = Math.min(time - previousTime, DELTA_TIME_MAX);
+    const deltaTime = Math.min(rawTime - previousRawTime, DELTA_TIME_MAX);
+    simTime += deltaTime;
 
     const duration=CAPTURE_CYCLE_DURATION;
-    const isCapturing = Math.floor(previousTime/duration) < Math.floor(time/duration);
+    const isCapturing = Math.floor(previousSimTime/duration) < Math.floor(simTime/duration);
     const clearDuration=CLEAR_CYCLE_DURATION;
-    const isClearing = Math.floor(previousTime/clearDuration) < Math.floor(time/clearDuration);
+    const isClearing = Math.floor(previousSimTime/clearDuration) < Math.floor(simTime/clearDuration);
     if(isClearing && ALTERNATE_FIELD_ON_CLEAR){
       currentFieldIndex=(currentFieldIndex+1)%FIELD_COUNT;
       swapSandSimulators();
-      gridStartTime = time;
+      gridStartTime = simTime;
     }
     if(isCapturing){
       webcamTexture.capture();
@@ -248,14 +251,15 @@ async function mainAsync(){
     // }
     uScale.value = 1 < camera.aspect ? camera.aspect : 1 / camera.aspect;
 
-    foregroundUpdater.time = time - gridStartTime;
+    foregroundUpdater.time = simTime - gridStartTime;
 
     renderer.render( scene, camera );
     if(stats){
       renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
       stats.update();
     }
-    previousTime=time;
+    previousRawTime=rawTime;
+    previousSimTime=simTime;
   }
 
 }
