@@ -1,5 +1,5 @@
 import Stats from "stats-gl";
-import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERATION_PER_SEC, ITERATION_PER_STEP_MAX, CAPTURE_CYCLE_DURATION, CLEAR_CYCLE_DURATION, FIELD_COUNT, ALTERNATE_FIELD_ON_CLEAR, FOREGROUND_GRID_SIZE, FOREGROUND_GRID_RESOLUTION, IS_DEBUG, FOV_MAX, CAMERA_Z } from './constants';
+import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERATION_PER_SEC, DELTA_TIME_MAX, CAPTURE_CYCLE_DURATION, CLEAR_CYCLE_DURATION, FIELD_COUNT, ALTERNATE_FIELD_ON_CLEAR, FOREGROUND_GRID_SIZE, FOREGROUND_GRID_RESOLUTION, IS_DEBUG, FOV_MAX, CAMERA_Z } from './constants';
 import { getElementSize, querySelectorOrThrow } from './dom_utils';
 import { SandSimulator } from './sand/SandSimulator';
 import { WebcamCanvasTexture } from './WebcamCanvasTexture';
@@ -210,7 +210,7 @@ async function mainAsync(){
   function animate(){
     const time=performance.now()*0.001;
 
-    const deltaTime = time - previousTime;
+    const deltaTime = Math.min(time - previousTime, DELTA_TIME_MAX);
 
     const duration=CAPTURE_CYCLE_DURATION;
     const isCapturing = Math.floor(previousTime/duration) < Math.floor(time/duration);
@@ -225,11 +225,8 @@ async function mainAsync(){
       webcamTexture.capture();
     }
 
-    const iterationPerFrame=Math.min(
-      ITERATION_PER_STEP_MAX,
-      Math.max(1,
-        Math.round(ITERATION_PER_SEC * deltaTime)
-      )
+    const iterationPerFrame=Math.max(1,
+      Math.round(ITERATION_PER_SEC * deltaTime)
     );
     for(let i=0;i<iterationPerFrame;i++){
       if(i==0){
@@ -268,4 +265,3 @@ async function mainAsync(){
 mainAsync().catch((error)=>{
   console.error(error);
 });
-
