@@ -3,7 +3,6 @@ import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERAT
 import { getElementSize, querySelectorOrThrow } from './dom_utils';
 import { SandSimulator } from './sand/SandSimulator';
 import { WebcamCanvasTexture } from './WebcamCanvasTexture';
-import './style.scss'
 
 import * as THREE from 'three/webgpu';
 import { getErrorMessage } from "./log_utils";
