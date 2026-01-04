@@ -1,4 +1,3 @@
-import Stats from "stats-gl";
 import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERATION_PER_SEC, DELTA_TIME_MAX, CAPTURE_CYCLE_DURATION, CLEAR_CYCLE_DURATION, FIELD_COUNT, ALTERNATE_FIELD_ON_CLEAR, FOREGROUND_GRID_SIZE, FOREGROUND_GRID_RESOLUTION, IS_DEBUG, FOV_MAX, CAMERA_Z } from './constants';
 import { getElementSize, querySelectorOrThrow } from './dom_utils';
 import { SandSimulator } from './sand/SandSimulator';
@@ -75,19 +74,6 @@ async function mainAsync(){
     return;
   }
   
-  let stats:Stats|undefined;
-  if(IS_DEBUG){
-    stats=new Stats({
-      precision:3,
-      trackHz: true,
-      trackGPU: true,
-      trackCPT: true,
-    });
-    stats.init( renderer );
-    stats.dom.style.top="0px";
-    document.body.appendChild( stats.dom );
-
-  }
 
   const webcamVideoElement = querySelectorOrThrow<HTMLVideoElement>(".p-webcam-video");
   let webcamTexture:WebcamCanvasTexture;
@@ -239,9 +225,6 @@ async function mainAsync(){
         sandSimulatorBackground.updateFrame(renderer,false,false,currentFieldIndex);
       }
     }
-    if(stats){
-      renderer.resolveTimestampsAsync( THREE.TimestampQuery.COMPUTE );
-    }
 
     // {
     //   const rawShader = await renderer.debug.getShaderAsync( scene, camera, cube );
@@ -253,10 +236,6 @@ async function mainAsync(){
     foregroundUpdater.time = simTime - gridStartTime;
 
     renderer.render( scene, camera );
-    if(stats){
-      renderer.resolveTimestampsAsync( THREE.TimestampQuery.RENDER );
-      stats.update();
-    }
     previousRawTime=rawTime;
     previousSimTime=simTime;
   }
