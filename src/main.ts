@@ -12,7 +12,7 @@ import { Inspector } from 'three/addons/inspector/Inspector.js';
 
 function showError(message:string){
   const errorElement=querySelectorOrThrow<HTMLElement>(".p-error");
-  errorElement.classList.remove("p-error--hidden");
+  errorElement.classList.remove("hidden");
   const errorMessageElement=querySelectorOrThrow<HTMLElement>(".p-error__message");
   errorMessageElement.textContent=message;
 
