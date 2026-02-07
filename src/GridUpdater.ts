@@ -1,32 +1,5 @@
-import { float, Fn, instanceIndex, mat3, normalLocal, positionLocal, uniform, uv, vec2, vec3 } from 'three/tsl';
+import { float, Fn, instanceIndex, positionLocal, uniform, uv, vec2, vec3 } from 'three/tsl';
 import * as THREE from 'three/webgpu';
-
-
-
-const axisAngleToMat3 = Fn(( [axisInput, angleInput]: [THREE.Node, THREE.Node] ) => {
-  const axis = axisInput.normalize().toVar();
-  const angle = angleInput;
-
-  const cosTheta = angle.cos();
-  const sinTheta = angle.sin();
-  const oneMinusCos = float(1.0).sub(cosTheta);
-
-  const ux = axis.x;
-  const uy = axis.y;
-  const uz = axis.z;
-
-  return mat3(
-    cosTheta.add(oneMinusCos.mul(ux.mul(ux))),
-    oneMinusCos.mul(uy.mul(ux)).add(sinTheta.mul(uz)),
-    oneMinusCos.mul(uz.mul(ux)).sub(sinTheta.mul(uy)),
-    oneMinusCos.mul(ux.mul(uy)).sub(sinTheta.mul(uz)),
-    cosTheta.add(oneMinusCos.mul(uy.mul(uy))),
-    oneMinusCos.mul(uz.mul(uy)).add(sinTheta.mul(ux)),
-    oneMinusCos.mul(ux.mul(uz)).add(sinTheta.mul(uy)),
-    oneMinusCos.mul(uy.mul(uz)).sub(sinTheta.mul(ux)),
-    cosTheta.add(oneMinusCos.mul(uz.mul(uz)))
-  );
-});
 
 
 export class GridUpdater{
@@ -40,8 +13,6 @@ export class GridUpdater{
     this.gridResolution=gridResolution;
     this.grid.count = this.gridResolution * this.gridResolution;
 
-    // 回転させないほうがいいかも
-    const orientation = axisAngleToMat3(vec3(0,1,0),float(this.uTime).mul(0*THREE.MathUtils.DEG2RAD)).toVar();
     this.grid.material.positionNode = Fn(()=>{
       const ix = float(instanceIndex.mod(this.gridResolution)).toVar();
       const iy = float(instanceIndex.div(this.gridResolution)).toVar();
@@ -55,11 +26,7 @@ export class GridUpdater{
       const time = float(this.uTime).toVar();
       const halfGravity = float(-2).mul(0.5);
       const movePosition = vec3(0,time.mul(time).mul(halfGravity),0);
-      return orientation.mul(positionLocal).add(offsetPosition.add(movePosition));
-    })();
-
-    this.grid.material.normalNode = Fn(() => {
-      return orientation.mul(normalLocal).normalize();
+      return positionLocal.add(offsetPosition.add(movePosition));
     })();
 
   }
