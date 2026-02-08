@@ -218,12 +218,14 @@ export class SandSimulator{
       If(bool(this.uIsCapturing),()=>{
         If(uv.sub(CAPTURE_POINT).length().lessThanEqual(CAPTURE_RADIUS),()=>{
           If(int(coord.x).mod(int(SAND_SPACING)).add(int(coord.y).mod(int(SAND_SPACING))).equal(int(0)),()=>{
-            const ttl=mix(float(SAND_TTL_MIN),float(SAND_TTL_MAX),hash(uv.mul(100)));
-            cellNext.assign(Cell(
-              KIND_SAND,
-              texture(this.webcamTexture,uvWebcam).r,
-              ttl,
-            ));
+            If(cellNext.get("kind").equal(KIND_AIR),()=>{
+              const ttl=mix(float(SAND_TTL_MIN),float(SAND_TTL_MAX),hash(uv.mul(100)));
+              cellNext.assign(Cell(
+                KIND_SAND,
+                texture(this.webcamTexture,uvWebcam).r,
+                ttl,
+              ));
+            });
           });
         });
       });
