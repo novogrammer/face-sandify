@@ -1,4 +1,4 @@
-import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERATION_PER_SEC, DELTA_TIME_MAX, CAPTURE_CYCLE_DURATION, CLEAR_CYCLE_DURATION, FIELD_COUNT, ALTERNATE_FIELD_ON_CLEAR, FOREGROUND_GRID_SIZE, FOREGROUND_GRID_RESOLUTION, IS_DEBUG, FOV_MAX, CAMERA_Z } from './constants';
+import { ENABLE_FORCE_WEBGL, SAND_SIMULATOR_WIDTH, SAND_SIMULATOR_HEIGHT, ITERATION_PER_SEC, DELTA_TIME_MAX, CAPTURE_CYCLE_DURATION, CLEAR_CYCLE_DURATION, FIELD_COUNT, ALTERNATE_FIELD_ON_CLEAR, FOREGROUND_GRID_SIZE, FOREGROUND_GRID_RESOLUTION, IS_DEBUG, FOV_MAX, CAMERA_Z, UV_SCALE } from './constants';
 import { getElementSize, querySelectorOrThrow } from './dom_utils';
 import { SandSimulator } from './sand/SandSimulator';
 import { WebcamCanvasTexture } from './WebcamCanvasTexture';
@@ -231,7 +231,8 @@ async function mainAsync(){
     //   console.log(rawShader);
     //   debugger;
     // }
-    uScale.value = 1 < camera.aspect ? camera.aspect : 1 / camera.aspect;
+    const scaleToContain = 1 < camera.aspect ? camera.aspect : 1 / camera.aspect;
+    uScale.value = scaleToContain * UV_SCALE;
 
     foregroundUpdater.time = simTime - gridStartTime;
 

@@ -30,6 +30,8 @@ export const FOREGROUND_GRID_RESOLUTION=32;
 // 一辺の長さ
 export const FOREGROUND_GRID_SIZE=1;
 
+export const UV_SCALE = 1.5;
+
 
 export const FOV_MAX = 30;
 
