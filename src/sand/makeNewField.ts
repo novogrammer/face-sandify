@@ -202,19 +202,48 @@ const makeNewFieldStairs=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   ],
 });
 
+const makeNewFieldCliffSlope=Fn(([uv]:[ReturnType<typeof vec2>])=>{
+  const kindNew=KIND_AIR.toVar("kindNew");
+  const thickness=float(0.5*0.01).toVar("thickness");
+
+
+  // 階段
+  Loop(5,4,({i,j})=>{
+    const offset = vec2(0.2,0).mul(float(i));
+    // 上下左右ループ境界を跨ぐ段を拾うため、x,y方向に合計4回判定する
+    const wrappedUv = uv.sub(offset).sub(vec2(j.mod(2),j.div(2))).toVar("wrappedUv");
+    If(distPointSegment(wrappedUv,vec2(-0.1,0.5),vec2(0.1,-0.5)).lessThanEqual(thickness),()=>{
+      kindNew.assign(KIND_WALL);
+    });
+  });
+
+  return kindNew;
+}).setLayout({
+  name:"makeNewFieldCliffSlope",
+  type:"int",
+  inputs:[
+    {
+      name:"uv",
+      type:"vec2",
+    },
+  ],
+});
+
 export const makeNewField=Fn(([uv,fieldIndex]:[ReturnType<typeof vec2>,ReturnType<typeof float>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
   If(fieldIndex.equal(int(0)),()=>{
     kindNew.assign(makeNewFieldClassic(uv));
   }).ElseIf(fieldIndex.equal(int(1)),()=>{
-    kindNew.assign(makeNewFieldStairs(uv));
+    kindNew.assign(makeNewFieldCliffSlope(uv));
   }).ElseIf(fieldIndex.equal(int(2)),()=>{
-    kindNew.assign(makeNewFieldSlope(uv));
+    kindNew.assign(makeNewFieldStairs(uv));
   }).ElseIf(fieldIndex.equal(int(3)),()=>{
-    kindNew.assign(makeNewFieldSieve(uv));
+    kindNew.assign(makeNewFieldSlope(uv));
   }).ElseIf(fieldIndex.equal(int(4)),()=>{
-    kindNew.assign(makeNewFieldHourglass(uv));
+    kindNew.assign(makeNewFieldSieve(uv));
   }).ElseIf(fieldIndex.equal(int(5)),()=>{
+    kindNew.assign(makeNewFieldHourglass(uv));
+  }).ElseIf(fieldIndex.equal(int(6)),()=>{
     kindNew.assign(makeNewFieldBucket(uv));
   }).Else(()=>{
     // DO NOTHING
