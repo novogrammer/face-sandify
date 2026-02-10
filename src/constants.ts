@@ -20,7 +20,7 @@ export const DIR_SWAP_PERIOD=8;
 // 砂を一定間隔で全消去する周期（秒）
 export const CLEAR_CYCLE_DURATION=15;
 // フィールド（壁・シンク）プリセットの数
-export const FIELD_COUNT=5;
+export const FIELD_COUNT=6;
 // クリア毎にフィールドを切り替えるかどうか
 export const ALTERNATE_FIELD_ON_CLEAR=true;
 
