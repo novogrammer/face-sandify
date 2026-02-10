@@ -180,7 +180,7 @@ const makeNewFieldStairs=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   // 階段
   Loop(10,4,({i,j})=>{
     const offset = vec2(0.1,-0.1).mul(float(i));
-    // 左右ループ境界を跨ぐ段を拾うため、x 方向に 0 / -1 の2回判定する
+    // 上下左右ループ境界を跨ぐ段を拾うため、x,y方向に合計4回判定する
     const wrappedUv = uv.sub(offset).sub(vec2(j.mod(2),j.div(2))).toVar("wrappedUv");
     If(distPointSegment(wrappedUv,p1,p2).lessThanEqual(thickness),()=>{
       kindNew.assign(KIND_WALL);
