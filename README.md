@@ -1,5 +1,5 @@
 # 顔砂（かおすな）
-HOMEWORKS 2025で展示する作品
+HOMEWORKS 2025 展示作品
 
 ## 作品を見る
 ![QR demo](qr_demo.png)<br>
