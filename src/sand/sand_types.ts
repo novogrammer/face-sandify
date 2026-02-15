@@ -31,7 +31,7 @@ export const toColor = Fn(([cell]:[ReturnType<typeof Cell>])=>{
   const rgb=vec3(1.0).toVar("rgb");
   const luminance=cell.get("luminance").toVar("luminance");
   If(cell.get("kind").equal(KIND_WALL),()=>{
-    rgb.assign(vec3(0.0,1.0,1.0));
+    rgb.assign(vec3(0.1,0.2,0.3));
   }).ElseIf(cell.get("kind").equal(KIND_SAND),()=>{
     rgb.assign(mix(vec3(0.75,0.0,0.0),vec3(1.0,0.75,0.0),luminance));
   }).ElseIf(cell.get("kind").equal(KIND_SINK),()=>{
