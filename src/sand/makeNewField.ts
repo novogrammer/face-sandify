@@ -1,5 +1,5 @@
 import { clamp, dot, Fn, int, vec2, length, If, min, float, Loop } from "three/tsl";
-import { KIND_AIR, KIND_SINK, KIND_WALL } from "./sand_types";
+import { KIND_AIR, KIND_WALL } from "./sand_types";
 
 const distPointSegment=Fn(([p,a,b]:[ReturnType<typeof vec2>,ReturnType<typeof vec2>,ReturnType<typeof vec2>])=>{
   const pa = p.sub(a).toVar("pa");
