@@ -25,3 +25,14 @@ export function querySelectorOrThrow<Type extends HTMLElement>(query:string):Typ
   }
   return element;
 }
+
+export function toggleFullscreen():void{
+  if (!document.fullscreenElement) {
+    document.body.requestFullscreen().catch((err) => {
+      console.error(`Error attempting to enable fullscreen mode: ${err.message} (${err.name})`);
+    });
+  } else {
+    document.exitFullscreen();
+  }
+
+}
