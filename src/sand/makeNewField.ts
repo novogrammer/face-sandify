@@ -26,41 +26,41 @@ const distPointSegment=Fn(([p,a,b]:[ReturnType<typeof vec2>,ReturnType<typeof ve
   ],
 });
 
-const makeNewFieldClassic=Fn(([uv]:[ReturnType<typeof vec2>])=>{
-  const kindNew=KIND_AIR.toVar("kindNew");
-  const thickness=float(0.5*0.01).toVar("thickness");
-  // 既存の斜めライン + 左右のシンク
-  {
-    If(min(
-      distPointSegment(uv,vec2(0.3,0.90),vec2(0.5,0.95)),
-      distPointSegment(uv,vec2(0.7,0.90),vec2(0.5,0.95)),
-      distPointSegment(uv,vec2(0.3,0.15),vec2(0.49,0.1)),
-      distPointSegment(uv,vec2(0.7,0.15),vec2(0.51,0.1)),
-      distPointSegment(uv,vec2(0.3,0.15),vec2(0.15,0.1)),
-      distPointSegment(uv,vec2(0.7,0.15),vec2(0.85,0.1)),
-    ).lessThanEqual(thickness),()=>{
-      kindNew.assign(KIND_WALL);
-    });
-  }
-  {
-    If(min(
-      distPointSegment(uv,vec2(0.15,0.5),vec2(0,0.5)),
-      distPointSegment(uv,vec2(0.85,0.5),vec2(1,0.5)),
-    ).lessThanEqual(thickness),()=>{
-      kindNew.assign(KIND_SINK);
-    });
-  }
-  return kindNew;
-}).setLayout({
-  name:"makeNewFieldClassic",
-  type:"int",
-  inputs:[
-    {
-      name:"uv",
-      type:"vec2",
-    },
-  ],
-});
+// const makeNewFieldClassic=Fn(([uv]:[ReturnType<typeof vec2>])=>{
+//   const kindNew=KIND_AIR.toVar("kindNew");
+//   const thickness=float(0.5*0.01).toVar("thickness");
+//   // 既存の斜めライン + 左右のシンク
+//   {
+//     If(min(
+//       distPointSegment(uv,vec2(0.3,0.90),vec2(0.5,0.95)),
+//       distPointSegment(uv,vec2(0.7,0.90),vec2(0.5,0.95)),
+//       distPointSegment(uv,vec2(0.3,0.15),vec2(0.49,0.1)),
+//       distPointSegment(uv,vec2(0.7,0.15),vec2(0.51,0.1)),
+//       distPointSegment(uv,vec2(0.3,0.15),vec2(0.15,0.1)),
+//       distPointSegment(uv,vec2(0.7,0.15),vec2(0.85,0.1)),
+//     ).lessThanEqual(thickness),()=>{
+//       kindNew.assign(KIND_WALL);
+//     });
+//   }
+//   {
+//     If(min(
+//       distPointSegment(uv,vec2(0.15,0.5),vec2(0,0.5)),
+//       distPointSegment(uv,vec2(0.85,0.5),vec2(1,0.5)),
+//     ).lessThanEqual(thickness),()=>{
+//       kindNew.assign(KIND_SINK);
+//     });
+//   }
+//   return kindNew;
+// }).setLayout({
+//   name:"makeNewFieldClassic",
+//   type:"int",
+//   inputs:[
+//     {
+//       name:"uv",
+//       type:"vec2",
+//     },
+//   ],
+// });
 const makeNewFieldBucket=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
   const thickness=float(0.5*0.01).toVar("thickness");
@@ -123,28 +123,28 @@ const makeNewFieldHourglass=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   ],
 });
 
-const makeNewFieldSieve=Fn(([uv]:[ReturnType<typeof vec2>])=>{
-  const kindNew=KIND_AIR.toVar("kindNew");
-  const thickness=float(0.5*0.01).toVar("thickness");
-  // 篩（ふるい）
-  Loop(11,({i})=>{
-    const offset = vec2(0.1,0).mul(float(i));
-    If(distPointSegment(uv,vec2(-0.05,0.2).add(offset),vec2(0.05,0.1).add(offset)).lessThanEqual(thickness),()=>{
-      kindNew.assign(KIND_WALL);
-    });
+// const makeNewFieldSieve=Fn(([uv]:[ReturnType<typeof vec2>])=>{
+//   const kindNew=KIND_AIR.toVar("kindNew");
+//   const thickness=float(0.5*0.01).toVar("thickness");
+//   // 篩（ふるい）
+//   Loop(11,({i})=>{
+//     const offset = vec2(0.1,0).mul(float(i));
+//     If(distPointSegment(uv,vec2(-0.05,0.2).add(offset),vec2(0.05,0.1).add(offset)).lessThanEqual(thickness),()=>{
+//       kindNew.assign(KIND_WALL);
+//     });
 
-  });
-  return kindNew;
-}).setLayout({
-  name:"makeNewFieldSieve",
-  type:"int",
-  inputs:[
-    {
-      name:"uv",
-      type:"vec2",
-    },
-  ],
-});
+//   });
+//   return kindNew;
+// }).setLayout({
+//   name:"makeNewFieldSieve",
+//   type:"int",
+//   inputs:[
+//     {
+//       name:"uv",
+//       type:"vec2",
+//     },
+//   ],
+// });
 
 const makeNewFieldSlope=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
@@ -202,32 +202,32 @@ const makeNewFieldStairs=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   ],
 });
 
-const makeNewFieldCliffSlope=Fn(([uv]:[ReturnType<typeof vec2>])=>{
-  const kindNew=KIND_AIR.toVar("kindNew");
-  const thickness=float(0.5*0.01).toVar("thickness");
+// const makeNewFieldCliffSlope=Fn(([uv]:[ReturnType<typeof vec2>])=>{
+//   const kindNew=KIND_AIR.toVar("kindNew");
+//   const thickness=float(0.5*0.01).toVar("thickness");
 
 
-  // 階段
-  Loop(5,4,({i,j})=>{
-    const offset = vec2(0.2,0).mul(float(i));
-    // 上下左右ループ境界を跨ぐ段を拾うため、x,y方向に合計4回判定する
-    const wrappedUv = uv.sub(offset).sub(vec2(j.mod(2),j.div(2))).toVar("wrappedUv");
-    If(distPointSegment(wrappedUv,vec2(-0.1,0.5),vec2(0.1,-0.5)).lessThanEqual(thickness),()=>{
-      kindNew.assign(KIND_WALL);
-    });
-  });
+//   // 階段
+//   Loop(5,4,({i,j})=>{
+//     const offset = vec2(0.2,0).mul(float(i));
+//     // 上下左右ループ境界を跨ぐ段を拾うため、x,y方向に合計4回判定する
+//     const wrappedUv = uv.sub(offset).sub(vec2(j.mod(2),j.div(2))).toVar("wrappedUv");
+//     If(distPointSegment(wrappedUv,vec2(-0.1,0.5),vec2(0.1,-0.5)).lessThanEqual(thickness),()=>{
+//       kindNew.assign(KIND_WALL);
+//     });
+//   });
 
-  return kindNew;
-}).setLayout({
-  name:"makeNewFieldCliffSlope",
-  type:"int",
-  inputs:[
-    {
-      name:"uv",
-      type:"vec2",
-    },
-  ],
-});
+//   return kindNew;
+// }).setLayout({
+//   name:"makeNewFieldCliffSlope",
+//   type:"int",
+//   inputs:[
+//     {
+//       name:"uv",
+//       type:"vec2",
+//     },
+//   ],
+// });
 
 const makeNewFieldSpike=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
@@ -269,21 +269,15 @@ const makeNewFieldSpike=Fn(([uv]:[ReturnType<typeof vec2>])=>{
 export const makeNewField=Fn(([uv,fieldIndex]:[ReturnType<typeof vec2>,ReturnType<typeof float>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
   If(fieldIndex.equal(int(0)),()=>{
-    kindNew.assign(makeNewFieldClassic(uv));
+    kindNew.assign(makeNewFieldBucket(uv));
   }).ElseIf(fieldIndex.equal(int(1)),()=>{
     kindNew.assign(makeNewFieldSpike(uv));
   }).ElseIf(fieldIndex.equal(int(2)),()=>{
-    kindNew.assign(makeNewFieldCliffSlope(uv));
-  }).ElseIf(fieldIndex.equal(int(3)),()=>{
     kindNew.assign(makeNewFieldStairs(uv));
-  }).ElseIf(fieldIndex.equal(int(4)),()=>{
+  }).ElseIf(fieldIndex.equal(int(3)),()=>{
     kindNew.assign(makeNewFieldSlope(uv));
-  }).ElseIf(fieldIndex.equal(int(5)),()=>{
-    kindNew.assign(makeNewFieldSieve(uv));
-  }).ElseIf(fieldIndex.equal(int(6)),()=>{
+  }).ElseIf(fieldIndex.equal(int(4)),()=>{
     kindNew.assign(makeNewFieldHourglass(uv));
-  }).ElseIf(fieldIndex.equal(int(7)),()=>{
-    kindNew.assign(makeNewFieldBucket(uv));
   }).Else(()=>{
     // DO NOTHING
   });
