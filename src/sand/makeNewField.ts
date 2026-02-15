@@ -99,7 +99,7 @@ const makeNewFieldHourglass=Fn(([uv]:[ReturnType<typeof vec2>])=>{
       mirroredUv.assign(vec2(uv.x.oneMinus(),uv.y));
     });
     If(min(
-      distPointSegment(mirroredUv,vec2(0.2,1.0),vec2(0.2,0.6)),
+      distPointSegment(mirroredUv,vec2(0.2,0.75),vec2(0.2,0.6)),
       distPointSegment(mirroredUv,vec2(0.2,0.6),vec2(0.49,0.4)),
       distPointSegment(mirroredUv,vec2(0.49,0.4),vec2(0.49,0.35)),
       distPointSegment(mirroredUv,vec2(0.49,0.35),vec2(0.2,0.15)),
