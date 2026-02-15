@@ -35,7 +35,7 @@ export const toColor = Fn(([cell]:[ReturnType<typeof Cell>])=>{
     rgb.assign(vec3(0.3,0.3,0.3));
   }).ElseIf(cell.get("kind").equal(KIND_SAND),()=>{
     const intensity=float(2.5);
-    rgb.assign(mix(vec3(0.75,0.05,0.0).mul(intensity),vec3(1.0,0.75,0.0).mul(intensity),luminance));
+    rgb.assign(mix(vec3(0.5,0.05,0.0).mul(intensity),vec3(1.0,0.75,0.0).mul(intensity),luminance));
   }).ElseIf(cell.get("kind").equal(KIND_SINK),()=>{
     rgb.assign(vec3(1.0,0.0,0.0));
   }).Else(()=>{
