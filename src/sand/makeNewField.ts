@@ -239,13 +239,15 @@ const makeNewFieldSpike=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   const pp=pt.add(vec2(l,l.mul(-1))).toVar("pp");
   const pm=pt.add(vec2(l.mul(-1),l.mul(-1))).toVar("pm");
 
-  Loop(2,({i})=>{
-    const repeatUv=uv.add(vec2(0.05,0.25).mul(i)).mod(vec2(0.1,0.5)).toVar("repeatUv");
-    If(distPointSegment(repeatUv,pt,pp).lessThanEqual(thickness),()=>{
-      kindNew.assign(KIND_WALL);
-    });
-    If(distPointSegment(repeatUv,pt,pm).lessThanEqual(thickness),()=>{
-      kindNew.assign(KIND_WALL);
+  If(uv.y.lessThan(0.5),()=>{
+    Loop(2,({i})=>{
+      const repeatUv=uv.add(vec2(0.05,0.1).mul(i)).mod(vec2(0.1,0.2)).toVar("repeatUv");
+      If(distPointSegment(repeatUv,pt,pp).lessThanEqual(thickness),()=>{
+        kindNew.assign(KIND_WALL);
+      });
+      If(distPointSegment(repeatUv,pt,pm).lessThanEqual(thickness),()=>{
+        kindNew.assign(KIND_WALL);
+      });
     });
   });
 
