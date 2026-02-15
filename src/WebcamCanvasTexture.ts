@@ -99,6 +99,7 @@ export class WebcamCanvasTexture {
     await delay(500);
 
     const canvasTexture = new THREE.CanvasTexture(canvasElement);
+    canvasTexture.colorSpace=THREE.SRGBColorSpace;
     const instance = new WebcamCanvasTexture(
       videoElement,
       canvasElement,
