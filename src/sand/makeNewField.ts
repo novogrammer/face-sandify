@@ -269,15 +269,15 @@ const makeNewFieldSpike=Fn(([uv]:[ReturnType<typeof vec2>])=>{
 export const makeNewField=Fn(([uv,fieldIndex]:[ReturnType<typeof vec2>,ReturnType<typeof float>])=>{
   const kindNew=KIND_AIR.toVar("kindNew");
   If(fieldIndex.equal(int(0)),()=>{
-    kindNew.assign(makeNewFieldBucket(uv));
-  }).ElseIf(fieldIndex.equal(int(1)),()=>{
-    kindNew.assign(makeNewFieldSpike(uv));
-  }).ElseIf(fieldIndex.equal(int(2)),()=>{
     kindNew.assign(makeNewFieldStairs(uv));
+  }).ElseIf(fieldIndex.equal(int(1)),()=>{
+    kindNew.assign(makeNewFieldHourglass(uv));
+  }).ElseIf(fieldIndex.equal(int(2)),()=>{
+    kindNew.assign(makeNewFieldBucket(uv));
   }).ElseIf(fieldIndex.equal(int(3)),()=>{
     kindNew.assign(makeNewFieldSlope(uv));
   }).ElseIf(fieldIndex.equal(int(4)),()=>{
-    kindNew.assign(makeNewFieldHourglass(uv));
+    kindNew.assign(makeNewFieldSpike(uv));
   }).Else(()=>{
     // DO NOTHING
   });
