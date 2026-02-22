@@ -152,7 +152,29 @@ const makeNewFieldSlope=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   // 坂
   Loop(2,({i})=>{
     const offset = vec2(1,0).mul(float(i));
-    If(distPointSegment(uv,vec2(-0.2,0.005).add(offset),vec2(0.9,0.405).add(offset)).lessThanEqual(thickness),()=>{
+    const p1=vec2(-0.2,0.005);
+    const p2=p1.add(vec2(0.5335,0.194));
+    const p3=p1.add(vec2(0.55,0.2));
+    const p4=p1.add(vec2(1.1,0.4));
+
+    const p5=p1.add(vec2(0.4125,0.15));
+    const p6=p5.add(vec2(0,-0.05));
+    const p7=p1.add(vec2(0.6875,0.25));
+    const p8=p7.add(vec2(0,-0.15));
+    If(distPointSegment(uv,p1.add(offset),p2.add(offset)).lessThanEqual(thickness),()=>{
+      kindNew.assign(KIND_WALL);
+    });
+    If(distPointSegment(uv,p3.add(offset),p4.add(offset)).lessThanEqual(thickness),()=>{
+      kindNew.assign(KIND_WALL);
+    });
+
+    If(distPointSegment(uv,p5.add(offset),p6.add(offset)).lessThanEqual(thickness),()=>{
+      kindNew.assign(KIND_WALL);
+    });
+    If(distPointSegment(uv,p7.add(offset),p8.add(offset)).lessThanEqual(thickness),()=>{
+      kindNew.assign(KIND_WALL);
+    });
+    If(distPointSegment(uv,p6.add(offset),p8.add(offset)).lessThanEqual(thickness),()=>{
       kindNew.assign(KIND_WALL);
     });
 
@@ -175,7 +197,8 @@ const makeNewFieldStairs=Fn(([uv]:[ReturnType<typeof vec2>])=>{
 
   const p1=vec2(-0.05,0.65).toVar("p1");
   const p2=vec2(0.05,0.65).toVar("p2");
-  const p3=vec2(0.05,0.55).toVar("p3");
+  const p3=vec2(0.05,0.68).toVar("p3");
+  const p4=vec2(0.05,0.55).toVar("p4");
 
   // 階段
   Loop(10,4,({i,j})=>{
@@ -185,7 +208,7 @@ const makeNewFieldStairs=Fn(([uv]:[ReturnType<typeof vec2>])=>{
     If(distPointSegment(wrappedUv,p1,p2).lessThanEqual(thickness),()=>{
       kindNew.assign(KIND_WALL);
     });
-    If(distPointSegment(wrappedUv,p2,p3).lessThanEqual(thickness),()=>{
+    If(distPointSegment(wrappedUv,p3,p4).lessThanEqual(thickness),()=>{
       kindNew.assign(KIND_WALL);
     });
   });
