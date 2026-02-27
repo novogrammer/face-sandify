@@ -294,9 +294,9 @@ export const makeNewField=Fn(([uv,fieldIndex]:[ReturnType<typeof vec2>,ReturnTyp
   If(fieldIndex.equal(int(0)),()=>{
     kindNew.assign(makeNewFieldStairs(uv));
   }).ElseIf(fieldIndex.equal(int(1)),()=>{
-    kindNew.assign(makeNewFieldHourglass(uv));
-  }).ElseIf(fieldIndex.equal(int(2)),()=>{
     kindNew.assign(makeNewFieldBucket(uv));
+  }).ElseIf(fieldIndex.equal(int(2)),()=>{
+    kindNew.assign(makeNewFieldHourglass(uv));
   }).ElseIf(fieldIndex.equal(int(3)),()=>{
     kindNew.assign(makeNewFieldSlope(uv));
   }).ElseIf(fieldIndex.equal(int(4)),()=>{
