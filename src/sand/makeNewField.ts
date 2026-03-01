@@ -262,7 +262,7 @@ const makeNewFieldSpike=Fn(([uv]:[ReturnType<typeof vec2>])=>{
   const pp=pt.add(vec2(l,l.mul(-1))).toVar("pp");
   const pm=pt.add(vec2(l.mul(-1),l.mul(-1))).toVar("pm");
 
-  If(uv.y.lessThan(0.5),()=>{
+  If(uv.y.lessThan(0.25),()=>{
     Loop(2,({i})=>{
       const repeatUv=uv.add(vec2(0.1,0.125).mul(i)).mod(vec2(0.2,0.25)).toVar("repeatUv");
       If(distPointSegment(repeatUv,pt,pp).lessThanEqual(thickness),()=>{
@@ -273,8 +273,6 @@ const makeNewFieldSpike=Fn(([uv]:[ReturnType<typeof vec2>])=>{
       });
     });
   });
-
-
 
   return kindNew;
 }).setLayout({
